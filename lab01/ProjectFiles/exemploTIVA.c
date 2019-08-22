@@ -97,6 +97,7 @@ int main (void) {
 			for(i = 0; i < 64; i++){
 				for(j = 0; j < 96; j++){
 					if(AirplaneImage[pixel] <= 0xF0 && AirplaneImage[pixel + 1] <= 0xF0 && AirplaneImage[pixel + 2] <= 0xF0){
+						draw_pixel(j*cont, i*cont);
 						draw_pixel(j*cont + 1, i*cont + 1);
 					}
 					pixel += 3;
