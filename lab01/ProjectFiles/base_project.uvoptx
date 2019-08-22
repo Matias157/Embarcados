@@ -649,7 +649,7 @@
 
   <Group>
     <GroupName>drivers</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -704,12 +704,12 @@
     <File>
       <GroupNumber>3</GroupNumber>
       <FileNumber>7</FileNumber>
-      <FileType>1</FileType>
+      <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>.\buffalo.c</PathWithFileName>
-      <FilenameWithoutPath>buffalo.c</FilenameWithoutPath>
+      <PathWithFileName>.\utils.s</PathWithFileName>
+      <FilenameWithoutPath>utils.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

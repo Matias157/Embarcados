@@ -423,9 +423,9 @@
               <FilePath>.\airplane.c</FilePath>
             </File>
             <File>
-              <FileName>buffalo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\buffalo.c</FilePath>
+              <FileName>utils.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\utils.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -872,9 +872,9 @@
               <FilePath>.\airplane.c</FilePath>
             </File>
             <File>
-              <FileName>buffalo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\buffalo.c</FilePath>
+              <FileName>utils.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\utils.s</FilePath>
             </File>
           </Files>
         </Group>

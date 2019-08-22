@@ -32,7 +32,6 @@
 #include "accel.h"
 #include "led.h"
 #include "airplane.h"
-#include "buffalo.h"
 
 #define LED_A      0
 #define LED_B      1
@@ -45,6 +44,10 @@
 
 tContext sContext;
 
+void SysTick_Init(void);
+void SysTick_Wait1ms(uint32_t delay);
+void SysTick_Wait1us(uint32_t delay);
+
 void init_all(){
 	cfaf128x128x16Init();
 	//joy_init();
@@ -53,6 +56,22 @@ void init_all(){
 
 void draw_pixel(uint16_t x, uint16_t y){
 	GrPixelDraw(&sContext, x, y);
+}
+
+void clear(void){
+	tRectangle tela;
+	tela.i16XMin = 0;
+	tela.i16YMin = 0;
+	tela.i16XMax = 127;
+	tela.i16YMax = 127;
+	
+	GrContextForegroundSet(&sContext, ClrBlack);
+	GrContextBackgroundSet(&sContext, ClrWhite);
+	
+	GrRectFill(&sContext, &tela);
+	
+	GrContextForegroundSet(&sContext, ClrWhite);
+	GrContextBackgroundSet(&sContext, ClrBlack);
 }
 
 void init_sidelong_menu(){
@@ -70,23 +89,28 @@ int main (void) {
 	init_all();
 	//Sidelong menu creation
 	init_sidelong_menu();
+	SysTick_Init();
 	
 	while(1)
 	{	
-		unsigned long pixel = BuffaloImage_start;
 		uint8_t i, i_centralizado;
 		uint8_t j, j_centralizado;
+		float cont = 0.5;
 		//centralizando
-		i_centralizado = CENTROTELA - ALTURAIMG/2;
-		j_centralizado = CENTROTELA - LARGURAIMG/2;
+		i_centralizado = CENTROTELA - (ALTURAIMG)/2;
+		j_centralizado = CENTROTELA - (LARGURAIMG)/2;
 		
-		for(i = i_centralizado; i < ALTURAIMG/2 + CENTROTELA; i++){
-			for(j = j_centralizado; j < LARGURAIMG/2 + CENTROTELA; j++){
-				if(BuffaloImage[pixel] <= 0xF0 && BuffaloImage[pixel + 1] <= 0xF0 && BuffaloImage[pixel + 2] <= 0xF0){
-					draw_pixel(j, i);
+		unsigned long pixel = AirplaneImage_start;
+		for(i = i_centralizado; i < (ALTURAIMG/2 + CENTROTELA); i++){
+			for(j = j_centralizado; j < (LARGURAIMG/2 + CENTROTELA); j++){
+				if(AirplaneImage[pixel] <= 0xF0 && AirplaneImage[pixel + 1] <= 0xF0 && AirplaneImage[pixel + 2] <= 0xF0){
+					draw_pixel(j*cont, i*cont);
 				}
 				pixel += 3;
 			}
 		}
+		SysTick_Wait1ms(500);
+		clear();
+		
 	}
 }

@@ -4,7 +4,7 @@
 ".\flash\cfaf128x128x16.o"
 ".\flash\joy.o"
 ".\flash\airplane.o"
-".\flash\buffalo.o"
+".\flash\utils.o"
 "..\driverlib\rvmdk\driverlib.lib"
 "..\grlib\rvmdk\grlib.lib"
 "C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\RTOS\RTX\LIB\ARM\RTX_CM4.lib"

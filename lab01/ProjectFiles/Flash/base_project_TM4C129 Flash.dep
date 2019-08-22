@@ -1,5 +1,5 @@
 Dependencies for Project 'base_project', Target 'TM4C129 Flash': (DO NOT MODIFY !)
-F (.\exemploTIVA.c)(0x5D5AC9E2)(-c --cpu Cortex-M4.fp -D__RTX -D__EVAL -g -O1 --apcs=interwork -I ..-I.\RTE\_TM4C129_Flash-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\RTOS\RTX\INC-IC:\Keil_v5\ARM\PACK\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129-D__UVISION_VERSION="526" -D_RTE_ -DTM4C1294NCPDT -Drvmdk -DPART_TM4C1294NCPDT -DTARGET_IS_TM4C129_RA0-o .\flash\exemplotiva.o --omf_browse .\flash\exemplotiva.crf --depend .\flash\exemplotiva.d)
+F (.\exemploTIVA.c)(0x5D5D8674)(-c --cpu Cortex-M4.fp -D__RTX -D__EVAL -g -O1 --apcs=interwork -I ..-I.\RTE\_TM4C129_Flash-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\RTOS\RTX\INC-IC:\Keil_v5\ARM\PACK\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129-D__UVISION_VERSION="526" -D_RTE_ -DTM4C1294NCPDT -Drvmdk -DPART_TM4C1294NCPDT -DTARGET_IS_TM4C129_RA0-o .\flash\exemplotiva.o --omf_browse .\flash\exemplotiva.crf --depend .\flash\exemplotiva.d)
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\RTOS\RTX\INC\cmsis_os.h)(0x5C8ABF2C)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x599F75EE)
 I (C:\Keil_v5\ARM\ARMCC\include\stddef.h)(0x599F75EC)
@@ -24,7 +24,6 @@ I (mic.h)(0x5A2F4836)
 I (accel.h)(0x5A2F3081)
 I (led.h)(0x5A2D9605)
 I (airplane.h)(0x5D5A8B68)
-I (buffalo.h)(0x5D5AC9E2)
 F (.\Abstract.txt)(0x5A79D3A5)()
 F (.\buttons.c)(0x5A2F2649)(-c --cpu Cortex-M4.fp -D__RTX -D__EVAL -g -O1 --apcs=interwork -I ..-I.\RTE\_TM4C129_Flash-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\RTOS\RTX\INC-IC:\Keil_v5\ARM\PACK\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129-D__UVISION_VERSION="526" -D_RTE_ -DTM4C1294NCPDT -Drvmdk -DPART_TM4C1294NCPDT -DTARGET_IS_TM4C129_RA0-o .\flash\buttons.o --omf_browse .\flash\buttons.crf --depend .\flash\buttons.d)
 I (C:\Keil_v5\ARM\ARMCC\include\stdbool.h)(0x599F75EE)
@@ -70,7 +69,7 @@ I (..\driverlib/uart.h)(0x5A0362CD)
 I (..\grlib/grlib.h)(0x5A0362CD)
 I (joy.h)(0x5A2F309B)
 F (.\airplane.c)(0x5D5AC9E2)(-c --cpu Cortex-M4.fp -D__RTX -D__EVAL -g -O1 --apcs=interwork -I ..-I.\RTE\_TM4C129_Flash-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\RTOS\RTX\INC-IC:\Keil_v5\ARM\PACK\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129-D__UVISION_VERSION="526" -D_RTE_ -DTM4C1294NCPDT -Drvmdk -DPART_TM4C1294NCPDT -DTARGET_IS_TM4C129_RA0-o .\flash\airplane.o --omf_browse .\flash\airplane.crf --depend .\flash\airplane.d)
-F (.\buffalo.c)(0x5D5AC9E2)(-c --cpu Cortex-M4.fp -D__RTX -D__EVAL -g -O1 --apcs=interwork -I ..-I.\RTE\_TM4C129_Flash-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\RTOS\RTX\INC-IC:\Keil_v5\ARM\PACK\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129-D__UVISION_VERSION="526" -D_RTE_ -DTM4C1294NCPDT -Drvmdk -DPART_TM4C1294NCPDT -DTARGET_IS_TM4C129_RA0-o .\flash\buffalo.o --omf_browse .\flash\buffalo.crf --depend .\flash\buffalo.d)
+F (.\utils.s)(0x5D5D8068)(--cpu Cortex-M4.fp --pd "__RTX SETA 1" --pd "__EVAL SETA 1" -g --apcs=interwork -I.\RTE\_TM4C129_Flash-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\Core\Include-IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\RTOS\RTX\INC-IC:\Keil_v5\ARM\PACK\Keil\TM4C_DFP\1.1.0\Device\Include\TM4C129--pd "__UVISION_VERSION SETA 526" --pd "_RTE_ SETA 1" --pd "TM4C1294NCPDT SETA 1"--list .\flash\utils.lst --xref -o .\flash\utils.o --depend .\flash\utils.d)
 F (..\driverlib\rvmdk\driverlib.lib)(0x5A0632BA)()
 F (..\grlib\rvmdk\grlib.lib)(0x5A0632CF)()
 F (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\RTOS\RTX\LIB\ARM\RTX_CM4.lib)(0x5C8BFAAA)()

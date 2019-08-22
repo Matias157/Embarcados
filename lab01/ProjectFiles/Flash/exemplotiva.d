@@ -23,4 +23,3 @@
 .\flash\exemplotiva.o: accel.h
 .\flash\exemplotiva.o: led.h
 .\flash\exemplotiva.o: airplane.h
-.\flash\exemplotiva.o: buffalo.h
