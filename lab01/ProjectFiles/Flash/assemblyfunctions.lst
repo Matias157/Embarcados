@@ -1,0 +1,173 @@
+
+
+
+ARM Macro Assembler    Page 1 
+
+
+    1 00000000                 AREA             |.text|, CODE, READONLY, ALIGN=
+2
+    2 00000000                 THUMB
+    3 00000000                 EXPORT           Redimensiona_imagem
+    4 00000000                 IMPORT           tela
+    5 00000000         
+    6 00000000         Redimensiona_imagem
+    7 00000000 E92D 01FF       push             {r8,r7,r6,r5,r4,r3,r2,r1,r0}
+    8 00000004 4D18            ldr              r5,=tela
+    9 00000006 4606            mov              r6,r0       ; imagem
+   10 00000008 F106 063A       add              r6,#0x3a    ; inicio da imagem 
+                                                            no vetor
+   11 0000000C 460F            mov              r7,r1       ; dimensao
+   12 0000000E         
+   13 0000000E F04F 0400       mov              r4,#0       ; i = 0 (percorre a
+                                                             imagem)
+   14 00000012         volta
+   15 00000012 F04F 0300       mov              r3,#0       ; j = 0 (percorre a
+                                                             imagem)
+   16 00000016         continua
+   17 00000016 F04F 0804       mov              r8,#4
+   18 0000001A FB04 F208       mul              r2,r4,r8    ; x = 4*i/dimensao 
+                                                            (percorre a tela)
+   19 0000001E FB03 F108       mul              r1,r3,r8    ; y = 4*j/dimensao 
+                                                            (percorre a tela)
+   20 00000022 FBB2 F2F7       udiv             r2,r2,r7
+   21 00000026 FBB1 F1F7       udiv             r1,r1,r7
+   22 0000002A         
+   23 0000002A         ; posicao_vetor_tela = (x_redimensionado*128 + y)
+   24 0000002A F04F 0880       mov              r8,#128
+   25 0000002E FB02 F008       mul              r0,r2,r8
+   26 00000032 4408            add              r0,r0,r1
+   27 00000034         
+   28 00000034         ; obtem o endereco do vetor "tela" e adiciona o valor da
+                        posicao_vetor_tela
+   29 00000034 4D0C            ldr              r5,=tela
+   30 00000036 4405            add              r5,r5,r0
+   31 00000038         
+   32 00000038         ; carrega em r8 o valor pixel da imagem a ser analisado
+   33 00000038         ; r6 percore o vetor da imagem de 3 em 3
+   34 00000038 F816 8B03       ldrb             r8,[r6],#3
+   35 0000003C F1B8 0FF0       cmp              r8,0xf0     ;verifica se eh um 
+                                                            pixel preto ou bran
+                                                            co
+   36 00000040 DA02            bge              ehbranco
+   37 00000042         
+   38 00000042 F04F 0800       mov              r8,#0       ; se for preto eh r
+                                                            epresentado como 0
+   39 00000046 E001            b                ehpreto
+   40 00000048         ehbranco
+   41 00000048 F04F 0801       mov              r8,#1       ; se for branco eh 
+                                                            representado como 1
+                                                            
+   42 0000004C         ehpreto
+   43 0000004C F885 8000       strb             r8,[r5]     ; coloca 1 ou 0 (br
+                                                            anco ou preto) no v
+                                                            etor tela
+   44 00000050         
+   45 00000050 F103 0301       add              r3,#1       ; adiciona 1 em i q
+
+
+
+ARM Macro Assembler    Page 2 
+
+
+                                                            ue percorre a image
+                                                            m (passa para o pix
+                                                            el seguinte)
+   46 00000054 2B60            cmp              r3,#96      ; se for menor que 
+                                                            96 continua, se nao
+                                                             adiciona 1 em j (p
+                                                            ercorre a proxima l
+                                                            inha)
+   47 00000056 D1DE            bne              continua
+   48 00000058 F104 0401       add              r4,#1       ; adiciona 1 em j q
+                                                            ue percorre a image
+                                                            m (passa para a lin
+                                                            ha seguinte)
+   49 0000005C 2C40            cmp              r4,#64      ; se for menor que 
+                                                            64 percorre a próxi
+                                                            ma linha, se nao en
+                                                            cerra a rotina
+   50 0000005E D1D8            bne              volta
+   51 00000060 E8BD 01FF       pop              {r8,r7,r6,r5,r4,r3,r2,r1,r0}
+   52 00000064 4770            bx               lr
+   53 00000066         
+                       
+              00 00 00000000 
+Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
+erwork --depend=.\flash\assemblyfunctions.d -o.\flash\assemblyfunctions.o -I.\R
+TE\_TM4C129_Flash -IC:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\CMSIS\Core\Include -IC:
+\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\CMSIS\RTOS\RTX\INC -IC:\Keil_v5\ARM\PACK\Keil
+\TM4C_DFP\1.1.0\Device\Include\TM4C129 --predefine="__RTX SETA 1" --predefine="
+__UVISION_VERSION SETA 526" --predefine="_RTE_ SETA 1" --predefine="TM4C1294NCP
+DT SETA 1" --list=.\flash\assemblyfunctions.lst assemblyFunctions.s
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+Relocatable symbols
+
+.text 00000000
+
+Symbol: .text
+   Definitions
+      At line 1 in file assemblyFunctions.s
+   Uses
+      None
+Comment: .text unused
+Redimensiona_imagem 00000000
+
+Symbol: Redimensiona_imagem
+   Definitions
+      At line 6 in file assemblyFunctions.s
+   Uses
+      At line 3 in file assemblyFunctions.s
+Comment: Redimensiona_imagem used once
+continua 00000016
+
+Symbol: continua
+   Definitions
+      At line 16 in file assemblyFunctions.s
+   Uses
+      At line 47 in file assemblyFunctions.s
+Comment: continua used once
+ehbranco 00000048
+
+Symbol: ehbranco
+   Definitions
+      At line 40 in file assemblyFunctions.s
+   Uses
+      At line 36 in file assemblyFunctions.s
+Comment: ehbranco used once
+ehpreto 0000004C
+
+Symbol: ehpreto
+   Definitions
+      At line 42 in file assemblyFunctions.s
+   Uses
+      At line 39 in file assemblyFunctions.s
+Comment: ehpreto used once
+volta 00000012
+
+Symbol: volta
+   Definitions
+      At line 14 in file assemblyFunctions.s
+   Uses
+      At line 50 in file assemblyFunctions.s
+Comment: volta used once
+6 symbols
+
+
+
+ARM Macro Assembler    Page 1 Alphabetic symbol ordering
+External symbols
+
+tela 00000000
+
+Symbol: tela
+   Definitions
+      At line 4 in file assemblyFunctions.s
+   Uses
+      At line 8 in file assemblyFunctions.s
+      At line 29 in file assemblyFunctions.s
+
+1 symbol
+344 symbols in table
