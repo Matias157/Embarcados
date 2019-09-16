@@ -462,7 +462,7 @@ void mostraDisplay(void const *argument){
 	char aux32[21];
 	while(1){
 		if(flagT5){
-			if(chave == 761 || chave == 13399 || chave == 48341 || !(count%201)){
+			if(chave_correta1 || chave_correta2 || chave_correta3 || !(count%201)){
 				char buffchave[10];
 				char bufftime[10];
 				intToString(chave, buffchave, 10, 10, 3);
@@ -507,7 +507,7 @@ void mostraDisplay(void const *argument){
 				GrStringDraw(&sContext,aux31, -1, 0, (sContext.psFont->ui8Height+2)*10, true);
 				GrStringDraw(&sContext,aux32, -1, 0, (sContext.psFont->ui8Height+2)*11, true);
 			}
-			if(chave >= 48341){
+			if(mensagemcorreta3){
 				osThreadTerminate(gerarPrimos_ID);
 				osThreadTerminate(decodifica_ID); 
 				osThreadTerminate(testaPenultimo_ID); 
