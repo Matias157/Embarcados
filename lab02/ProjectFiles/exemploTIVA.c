@@ -230,6 +230,11 @@ void init_sidelong_menu(){
  *    Threads
  *---------------------------------------------------------------------------*/
 
+/*
+A geração de números primos começa definindo valores iniciais para a chave, para o primo anterior e para o próximo primo (3, 2 e 5 respectivamente), e a cada iteração vamos substituir o valor do próximo primo pelo valor gerado, o valor da chave pelo valor do próximo primo e valor do primo anterior pelo valor chave.
+Em cada iteração é utilizado um valor cont que representa a “posição” do primo (ex: 1º = 2, 2º = 3, 3º = 5, etc). Este valor é incrementado sempre que geramos um novo primo.
+A variável que receberá o novo primo começa com 3 e é incrementada sempre que achamos ou não um novo primo.
+*/
 void gerarPrimos(void const *argument){ 
 	while(1){
 		if(flagT1){
@@ -263,6 +268,12 @@ void gerarPrimos(void const *argument){
 	}
 }
 
+/*
+Até que a chave esteja correta, a mensagem será decodificada sempre.
+Para caracteres em posições pares, a decodificação deve ser feita dividindo o caractere codificado pela diferença entre a chave e seu número primo antecessor.
+Para caracteres em posições ímpares, a decodificação deve ser feita dividindo o caractere codificado pela diferença entre a chave e seu número primo sucessor.
+Quando a chave correta for encontrada, a mensagem decodificada não será mais alterada.
+*/
 void decodifica(void const *argument){
 	while(1){
 		if(flagT2){
@@ -270,9 +281,7 @@ void decodifica(void const *argument){
 			int16_t aux;
 			int16_t letraux;
 			char letra;
-			if(true){
-				chave = chave;
-			}
+			
 			if(!mensagemcorreta1){
 				for(i = 0; i < 60; i+=2){
 					aux = Mensagem1[i];
@@ -291,6 +300,7 @@ void decodifica(void const *argument){
 			}
 			if(chave_correta1)
 				mensagemcorreta1 = true;
+			
 			j = 0;
 			aux = 0x00;
 			if(!mensagemcorreta2){
@@ -311,6 +321,7 @@ void decodifica(void const *argument){
 			}
 			if(chave_correta2)
 				mensagemcorreta2 = true;
+			
 			j = 0;
 			aux = 0x00;
 			if(!mensagemcorreta3){
@@ -331,9 +342,9 @@ void decodifica(void const *argument){
 			}
 			if(chave_correta3)
 				mensagemcorreta3 = true;
+			
 			flagT2 = false;
 			flagT5 = true;
-			osKernelSysTickMicroSec(1000);
 			osThreadYield();
 		}
 		else{
@@ -342,20 +353,24 @@ void decodifica(void const *argument){
 	}
 }
 
+/*
+Uma variável auxiliar irá receber a penúltima word da mensagem
+Vamos testar se a variável auxiliar é igual ao produto da chave com o próximo primo
+Em caso de resultado positivo, setamos uma flag de chave correta
+*/
 void testaPenultimo(void const *argument){
 	while(1){	
 		if(flagT3){
 			uint32_t aux1 = 0x00;
 			uint32_t aux2 = 0x00;
 			uint32_t aux3 = 0x00;
+			
 			aux1 += Mensagem1[60];
 			aux1 += Mensagem1[61]*16*16;
 			aux1 += Mensagem1[62]*16*16*16*16;
 			aux1 += Mensagem1[63]*16*16*16*16*16*16;
-			if(aux1 == (chave*prox_primo)){
+			if(aux1 == (chave*prox_primo))
 				chave_correta1 = true;
-				mensagemcorreta1 = true;
-			}
 			
 			aux2 += Mensagem2[60];
 			aux2 += Mensagem2[61]*16*16;
@@ -374,7 +389,7 @@ void testaPenultimo(void const *argument){
 			flagT3 = false;
 			if(!(chave_correta1 || chave_correta2 || chave_correta3))
 				flagT1 = true;
-			//flagT2 = true;
+			flagT2 = true;
 			osThreadYield();
 		}
 		else{
@@ -383,12 +398,18 @@ void testaPenultimo(void const *argument){
 	}
 }
 
+/*
+Uma variável auxiliar irá receber a última word da mensagem
+Vamos testar se a variável auxiliar é igual ao produto da chave com o primo anterior
+Em caso de resultado positivo, setamos uma flag de chave correta
+*/
 void testaUltimo(void const *argument){
 	while(1){
 		if(flagT4){
 			uint32_t aux1 = 0x00;
 			uint32_t aux2 = 0x00;
 			uint32_t aux3 = 0x00;
+			
 			aux1 += Mensagem1[64];
 			aux1 += Mensagem1[65]*16*16;
 			aux1 += Mensagem1[66]*16*16*16*16;
@@ -424,6 +445,13 @@ void testaUltimo(void const *argument){
 	}
 }
 
+/*
+Mostra no display as seguintes informações:
+Valor da chave calculada
+Tempo decorrido até encontrar a chave atual
+Para qual mensagem a chave está correta
+As três mensagens decodificadas, independente de estarem certas ou não.
+*/
 void mostraDisplay(void const *argument){
 	int i;
 	char aux11[21];
@@ -434,7 +462,7 @@ void mostraDisplay(void const *argument){
 	char aux32[21];
 	while(1){
 		if(flagT5){
-			if(chave == 761 || chave == 13399 || chave == 48341){
+			if(chave == 761 || chave == 13399 || chave == 48341 || !(count%201)){
 				char buffchave[10];
 				char bufftime[10];
 				intToString(chave, buffchave, 10, 10, 3);
@@ -503,8 +531,8 @@ int main (void) {
 	
 	osKernelInitialize();
 	
-	//init_all();
-	//init_sidelong_menu();
+	init_all();
+	init_sidelong_menu();
 	
 	flagT1 = true;
 	
