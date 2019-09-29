@@ -33,14 +33,27 @@
 #include "Background.h"
 
 
-#define LED_A      0
-#define LED_B      1
-#define LED_C      2
-#define LED_D      3
-#define LED_CLK    7
+#define ALTURA_ANDAR			20
+#define ESPESSURA_CHAO		2
+#define ESPACO_PONTUACAO	13
+#define QUANT_ANDARES			5
+#define LARGURA_TELA			128
+#define ALTURA_EDDIE			14
+#define LARGURA_EDDIE			8
+#define X_INICIAL_EDDIE		64
+#define ANDAR_INICIAL_EDDIE		5
 
 //To print on the screen
 tContext sContext;
+
+void SysTick_Init(void);
+void SysTick_Wait1ms(uint32_t delay);
+void SysTick_Wait1us(uint32_t delay);
+
+//***************** Variáveis globais  ***************************************
+uint32_t movimento_eddie;
+uint32_t x_anterior_eddie, x_atual_eddie;
+uint32_t andar_atual_eddie;
 
 /*----------------------------------------------------------------------------
  *  Transforming int to string
@@ -161,30 +174,6 @@ void fill_circle(uint16_t x, uint16_t y){
 		(sContext.psFont->ui8Height+2)*y + sContext.psFont->ui8Height/2 - 1, 
 		(sContext.psFont->ui8MaxWidth)/2-1);
 }
-
-void init_sidelong_menu(){
-	uint8_t i;
-	GrContextInit(&sContext, &g_sCfaf128x128x16);
-	
-	GrFlush(&sContext);
-	GrContextFontSet(&sContext, g_psFontFixed6x8);
-	
-	GrContextForegroundSet(&sContext, ClrWhite);
-	GrContextBackgroundSet(&sContext, ClrBlack);
-	
-	//Escreve menu lateral:
-	GrStringDraw(&sContext,"Exemplo EK-TM4C1294XL", -1, 0, (sContext.psFont->ui8Height+2)*0, true);
-	GrStringDraw(&sContext,"---------------------", -1, 0, (sContext.psFont->ui8Height+2)*1, true);
-	GrStringDraw(&sContext,"RGB", -1, 0, (sContext.psFont->ui8Height+2)*2, true);
-	GrStringDraw(&sContext,"ACC", -1, 0, (sContext.psFont->ui8Height+2)*3, true);
-	GrStringDraw(&sContext,"TMP", -1, 0, (sContext.psFont->ui8Height+2)*4, true);
-	GrStringDraw(&sContext,"OPT", -1, 0, (sContext.psFont->ui8Height+2)*5, true);
-	GrStringDraw(&sContext,"MIC", -1, 0, (sContext.psFont->ui8Height+2)*6, true);
-	GrStringDraw(&sContext,"JOY", -1, 0, (sContext.psFont->ui8Height+2)*7, true);
-	GrStringDraw(&sContext,"BUT", -1, 0, (sContext.psFont->ui8Height+2)*8, true);
-	GrStringDraw(&sContext,"NOVO ICONE", -1, 0, (sContext.psFont->ui8Height+2)*9, true);
-
-}
 	
 uint32_t saturate(uint8_t r, uint8_t g, uint8_t b){
 	uint8_t *max = &r, 
@@ -207,6 +196,175 @@ uint32_t saturate(uint8_t r, uint8_t g, uint8_t b){
 					( (uint32_t) b       );
 }
 
+void background(){
+	uint32_t color = 0xF34EF1; //cor roxa
+	uint32_t i, j, pixel, n;
+	pixel = Background_start;
+	for(n = 1; n <= QUANT_ANDARES; n++){		//imprime o chao de todos os andares
+		for(j = 0; j < ESPESSURA_CHAO; j++){ 
+			for(i = 0; i < LARGURA_TELA; i++){
+				GrContextForegroundSet(&sContext, color);
+				//deixa um espaço para pontuacao no topo da tela (ESPACO_PONTUACAO)
+				draw_pixel(i, j+ESPACO_PONTUACAO+(ALTURA_ANDAR+ESPESSURA_CHAO)*n);
+			}
+		}
+	}
+}
+
+
+// andar mais alto é o 1, o mais baixo é o 5
+// posicao é o tamanho da largura da tela menos a largura do eddie (0 a 120)
+void imprimeEddie(uint32_t andar, uint32_t posicao){
+	uint32_t color = 0x00, i, j, pixel;
+	pixel = Eddie_start;
+	for(j = 0; j < ALTURA_EDDIE; j++){ //altura
+		for(i = 0; i < LARGURA_EDDIE; i++){ //largura
+			color = 0x00;
+			color += Eddie[pixel+2];
+			color += Eddie[pixel+1]*16*16; //desloca 8 bits para esquerda
+			color += Eddie[pixel]*16*16*16*16; //desloca 16 bits para esquerda
+			color += 0x00*16*16*16*16*16*16;
+			//não imprime os pixels pretos ou azuis para dar efeito de fundo transparente
+			if(color != 0x00000000 && color != 0x000000FF){ 
+				GrContextForegroundSet(&sContext, color);
+				draw_pixel(i+posicao, j-ALTURA_EDDIE+ESPACO_PONTUACAO+(ALTURA_ANDAR+ESPESSURA_CHAO)*andar);
+			}
+			pixel += 3;
+		}
+	}
+}
+
+// andar mais alto é o 1, o mais baixo é o 5
+// posicao é o tamanho da largura da tela menos a largura do eddie (0 a 120)
+void apagaEddie(uint32_t andar, uint32_t posicao){
+	uint32_t color = 0xFF, i, j, pixel;
+	pixel = Eddie_start;
+	for(j = 0; j < ALTURA_EDDIE; j++){ //altura
+		for(i = 0; i < LARGURA_EDDIE; i++){ //largura
+			color = 0x00;
+			//não imprime os pixels pretos ou azuis para dar efeito de fundo transparente
+			GrContextForegroundSet(&sContext, color);
+			draw_pixel(i+posicao, j-ALTURA_EDDIE+ESPACO_PONTUACAO+(ALTURA_ANDAR+ESPESSURA_CHAO)*andar);
+		}
+	}
+}
+
+void escada(){
+	uint32_t color = 0x00, i, j, pixel;
+	pixel = Escada_start;
+	for(j = 0; j < 20; j++){ //altura
+		for(i = 0; i < 17; i++){ //largura
+			color = 0x00;
+			color += Escada[pixel+2];
+			color += Escada[pixel+1]*16*16;
+			color += Escada[pixel]*16*16*16*16;
+			color += 0x00*16*16*16*16*16*16;
+			if(color != 0x00000000 && color != 0x000000FF){ //não imprime os pixels azuis para dar efeito de fundo transparente
+				GrContextForegroundSet(&sContext, color);
+				draw_pixel(i+40, j+15+22+22+22+22);
+			}
+			pixel += 3;
+		}
+	}
+}
+
+void chefao(){
+	uint32_t color = 0x00, i, j, pixel;
+	pixel = Chefao_start;
+	for(j = 0; j < 14; j++){ //altura
+		for(i = 0; i < 8; i++){ //largura
+			color = 0x00;
+			color += Chefao[pixel+2];
+			color += Chefao[pixel+1]*16*16;
+			color += Chefao[pixel]*16*16*16*16;
+			color += 0x00*16*16*16*16*16*16;
+			if(color != 0x00000000 && color != 0x000000FF){ //não imprime os pixels azuis para dar efeito de fundo transparente
+				GrContextForegroundSet(&sContext, color);
+				draw_pixel(i+64, j+21);
+			}
+			pixel += 3;
+		}
+	}
+}
+
+void inimigo(){
+	uint32_t color = 0x00, i, j, pixel;
+	pixel = Inimigo_start;
+	for(j = 0; j < 5; j++){ //altura
+		for(i = 0; i < 8; i++){ //largura
+			color = 0x00;
+			color += Inimigo[pixel+2];
+			color += Inimigo[pixel+1]*16*16;
+			color += Inimigo[pixel]*16*16*16*16;
+			color += 0x00*16*16*16*16*16*16;
+			if(color != 0x00000000 && color != 0x000000FF){ //não imprime os pixels azuis para dar efeito de fundo transparente
+				GrContextForegroundSet(&sContext, color);
+				draw_pixel(i+20, j+30+22+22+22);
+			}
+			pixel += 3;
+		}
+	}
+}
+
+void item(){
+	uint32_t color = 0x00, i, j, pixel;
+	pixel = Item_start;
+	for(j = 0; j < 4; j++){ //altura
+		for(i = 0; i < 8; i++){ //largura
+			color = 0x00;
+			color += Item[pixel+2];
+			color += Item[pixel+1]*16*16;
+			color += Item[pixel]*16*16*16*16;
+			color += 0x00*16*16*16*16*16*16;
+			if(color != 0x00000000 && color != 0x000000FF){ //não imprime os pixels azuis para dar efeito de fundo transparente
+				GrContextForegroundSet(&sContext, color);
+				draw_pixel(i+20, j+16+22+22);
+			}
+			pixel += 3;
+		}
+	}
+}
+
+uint32_t leituraJoystick(){
+	int x, y;
+	x = joy_read_x();
+	y = joy_read_y();
+	x = x*200/0xFFF-100; 
+	y = y*200/0xFFF-100;
+	if (x<-50 && y>-50 && y<50){
+		movimento_eddie = 1;						//esquerda
+	}
+	else if (x>50 && y>-50 && y<50){
+		movimento_eddie = 2;						//direita
+	}
+	else if (y<-50 && x>-50 && x<50){
+		movimento_eddie = 3;						//baixo
+	}
+	else if (y>50 && x>-50 && x<50){
+		movimento_eddie = 4;						//cima
+	}
+	else{
+		movimento_eddie = 0;
+	}
+}
+
+void movimentaEddie(){
+	if(movimento_eddie == 3){
+		// para cima se houver escada, senão só mexe as perninhas
+	}
+	else if(movimento_eddie == 4){
+		// para baixo se houver escada, senão só mexe as perninhas
+	}
+	else if(movimento_eddie == 2 && x_atual_eddie < 120){
+		x_atual_eddie = x_anterior_eddie + 2;
+	}
+	else if(movimento_eddie == 1 && x_atual_eddie > 0){
+		x_atual_eddie = x_anterior_eddie -2;
+	}
+	apagaEddie(andar_atual_eddie, x_anterior_eddie);
+	imprimeEddie(andar_atual_eddie, x_atual_eddie);
+	x_anterior_eddie = x_atual_eddie;
+}
 /*----------------------------------------------------------------------------
  *      Main
  *---------------------------------------------------------------------------*/
@@ -217,170 +375,30 @@ int main (void) {
 	float temp,lux;
 	float mic;
 	bool s1_press, s2_press;
-	uint8_t  	r, g, b;
-	uint32_t color = 0x00, i, j, pixel;
-	uint16_t x, y, z, angle=0;
+	uint32_t i, i_anterior = 0;
+	
+	movimento_eddie = 0;
+	x_anterior_eddie = X_INICIAL_EDDIE;
+	x_atual_eddie = X_INICIAL_EDDIE;
+	andar_atual_eddie = ANDAR_INICIAL_EDDIE;
 	
 	//Initializing all peripherals
 	init_all();
+	SysTick_Init();
 	GrContextInit(&sContext, &g_sCfaf128x128x16);
 	
 	GrFlush(&sContext);
 	GrContextFontSet(&sContext, g_psFontFixed6x8);
 
   while(1){
-///*  Joystick		*/
-//			x = joy_read_x();
-//			y = joy_read_y();
-//			center = joy_read_center();
-
-	pixel = Background_start;
-	for(j = 0; j < 128; j++){ //altura
-		for(i = 0; i < 128; i++){ //largura
-			color = 0x00;
-			color += Background[pixel+2];
-			color += Background[pixel+1]*16*16;
-			color += Background[pixel]*16*16*16*16;
-			color += 0x00*16*16*16*16*16*16;
-			if(color != 0x000000FF){ //não imprime os pixels azuis para dar efeito de fundo transparente
-				GrContextForegroundSet(&sContext, color);
-				draw_pixel(i, j);
-			}
-			pixel += 3;
-		}
-	}
-
-	pixel = Eddie_start;
-	for(j = 0; j < 14; j++){ //altura
-		for(i = 0; i < 8; i++){ //largura
-			color = 0x00;
-			color += Eddie[pixel+2];
-			color += Eddie[pixel+1]*16*16;
-			color += Eddie[pixel]*16*16*16*16;
-			color += 0x00*16*16*16*16*16*16;
-			if(color != 0x000000FF){ //não imprime os pixels azuis para dar efeito de fundo transparente
-				GrContextForegroundSet(&sContext, color);
-				draw_pixel(i+64, j+19+22+22+22+22+2);
-			}
-			pixel += 3;
-		}
-	}
-	
-	pixel = Escada_start;
-	for(j = 0; j < 20; j++){ //altura
-		for(i = 0; i < 17; i++){ //largura
-			color = 0x00;
-			color += Escada[pixel+2];
-			color += Escada[pixel+1]*16*16;
-			color += Escada[pixel]*16*16*16*16;
-			color += 0x00*16*16*16*16*16*16;
-			if(color != 0x000000FF){ //não imprime os pixels azuis para dar efeito de fundo transparente
-				GrContextForegroundSet(&sContext, color);
-				draw_pixel(i+40, j+15+22+22+22+22);
-			}
-			pixel += 3;
-		}
-	}
-	
-	pixel = Chefao_start;
-	for(j = 0; j < 14; j++){ //altura
-		for(i = 0; i < 8; i++){ //largura
-			color = 0x00;
-			color += Chefao[pixel+2];
-			color += Chefao[pixel+1]*16*16;
-			color += Chefao[pixel]*16*16*16*16;
-			color += 0x00*16*16*16*16*16*16;
-			if(color != 0x000000FF){ //não imprime os pixels azuis para dar efeito de fundo transparente
-				GrContextForegroundSet(&sContext, color);
-				draw_pixel(i+64, j+19);
-			}
-			pixel += 3;
-		}
-	}
-	
-	pixel = Inimigo_start;
-	for(j = 0; j < 5; j++){ //altura
-		for(i = 0; i < 8; i++){ //largura
-			color = 0x00;
-			color += Inimigo[pixel+2];
-			color += Inimigo[pixel+1]*16*16;
-			color += Inimigo[pixel]*16*16*16*16;
-			color += 0x00*16*16*16*16*16*16;
-			if(color != 0x000000FF){ //não imprime os pixels azuis para dar efeito de fundo transparente
-				GrContextForegroundSet(&sContext, color);
-				draw_pixel(i+20, j+29+22+22+22);
-			}
-			pixel += 3;
-		}
-	}
-
-	pixel = Item_start;
-	for(j = 0; j < 4; j++){ //altura
-		for(i = 0; i < 8; i++){ //largura
-			color = 0x00;
-			color += Item[pixel+2];
-			color += Item[pixel+1]*16*16;
-			color += Item[pixel]*16*16*16*16;
-			color += 0x00*16*16*16*16*16*16;
-			if(color != 0x000000FF){ //não imprime os pixels azuis para dar efeito de fundo transparente
-				GrContextForegroundSet(&sContext, color);
-				draw_pixel(i+20, j+14+22+22);
-			}
-			pixel += 3;
-		}
-	}
-	
-
-	/*x = 0.0048*joy_read_x();
-	y = -0.0029*joy_read_y() + 12;
-
-	GrContextForegroundSet(&sContext, ClrTurquoise);
-	GrContextBackgroundSet(&sContext, ClrBlack);
-
-	draw_circle(x, y);
-	fill_circle(x, y);
-	
-	
-	for(i = 0; i < 1000000; i++){}
-	
-	GrContextForegroundSet(&sContext, ClrBlack);
-	GrContextBackgroundSet(&sContext, ClrWhite);
-	
-	draw_circle(x, y);
-	fill_circle(x, y);*/
-
-//			intToString(x*200/0xFFF-100, pbufx, 10, 10, 4);
-//			intToString(y*200/0xFFF-100, pbufy, 10, 10, 4);
-			
-//			if (center)
-//				intToString(1, pbufz, 10, 10, 1);
-//			else
-//				intToString(0, pbufz, 10, 10, 1);
-//				
-//			GrContextBackgroundSet(&sContext, ClrBlack);
-//			GrContextForegroundSet(&sContext, ClrWhite);
-//			GrStringDraw(&sContext,(char*)pbufx, -1, (sContext.psFont->ui8MaxWidth)*6,  (sContext.psFont->ui8Height+2)*7, true);
-//			GrStringDraw(&sContext,(char*)pbufy, -1,  (sContext.psFont->ui8MaxWidth)*11, (sContext.psFont->ui8Height+2)*7, true);
-//			GrStringDraw(&sContext,(char*)pbufz, -1,  (sContext.psFont->ui8MaxWidth)*18, (sContext.psFont->ui8Height+2)*7, true);
-//
-///*	Botoes 	*/			
-//			s1_press = button_read_s1();
-//			s2_press = button_read_s2();
-
-//			if (s1_press)
-//				intToString(1, pbufx, 10, 10, 1);
-//			else
-//				intToString(0, pbufx, 10, 10, 1);
-
-//			if (s2_press)
-//				intToString(1, pbufy, 10, 10, 1);
-//			else
-//				intToString(0, pbufy, 10, 10, 1);
-
-//			GrContextBackgroundSet(&sContext, ClrBlack);
-//			GrContextForegroundSet(&sContext, ClrWhite);
-//			GrStringDraw(&sContext,(char*)pbufx, -1, (sContext.psFont->ui8MaxWidth)*6,  (sContext.psFont->ui8Height+2)*8, true);
-//			GrStringDraw(&sContext,(char*)pbufy, -1,  (sContext.psFont->ui8MaxWidth)*11, (sContext.psFont->ui8Height+2)*8, true);
-			
+	leituraJoystick();
+	escada();
+	background();
+	movimentaEddie();
+	inimigo();
+	chefao();
+	item();
+	SysTick_Wait1ms(50);
+		
 	}	
 }
