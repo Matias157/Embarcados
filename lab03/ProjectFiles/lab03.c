@@ -42,6 +42,16 @@
 #define LARGURA_EDDIE			8
 #define X_INICIAL_EDDIE		64
 #define ANDAR_INICIAL_EDDIE		5
+#define ALTURA_ESCADA			20
+#define LARGURA_ESCADA		17
+#define ALTURA_CHEFAO		14
+#define LARGURA_CHEFAO		8
+#define ALTURA_INIMIGO		5
+#define LARGURA_INIMIGO		8
+#define ALTURA_ITEM				4
+#define LARGURA_ITEM			8
+#define TOTAL_ESCADAS		4
+
 
 //To print on the screen
 tContext sContext;
@@ -54,6 +64,8 @@ void SysTick_Wait1us(uint32_t delay);
 uint32_t movimento_eddie;
 uint32_t x_anterior_eddie, x_atual_eddie;
 uint32_t andar_atual_eddie;
+uint32_t posicaoEscadas[2][4];
+uint16_t pontos;
 
 /*----------------------------------------------------------------------------
  *  Transforming int to string
@@ -196,7 +208,7 @@ uint32_t saturate(uint8_t r, uint8_t g, uint8_t b){
 					( (uint32_t) b       );
 }
 
-void background(){
+void imprimeBackground(){
 	uint32_t color = 0xF34EF1; //cor roxa
 	uint32_t i, j, pixel, n;
 	pixel = Background_start;
@@ -242,37 +254,44 @@ void apagaEddie(uint32_t andar, uint32_t posicao){
 	for(j = 0; j < ALTURA_EDDIE; j++){ //altura
 		for(i = 0; i < LARGURA_EDDIE; i++){ //largura
 			color = 0x00;
-			//não imprime os pixels pretos ou azuis para dar efeito de fundo transparente
-			GrContextForegroundSet(&sContext, color);
-			draw_pixel(i+posicao, j-ALTURA_EDDIE+ESPACO_PONTUACAO+(ALTURA_ANDAR+ESPESSURA_CHAO)*andar);
-		}
-	}
-}
-
-void escada(){
-	uint32_t color = 0x00, i, j, pixel;
-	pixel = Escada_start;
-	for(j = 0; j < 20; j++){ //altura
-		for(i = 0; i < 17; i++){ //largura
-			color = 0x00;
-			color += Escada[pixel+2];
-			color += Escada[pixel+1]*16*16;
-			color += Escada[pixel]*16*16*16*16;
+			color += Eddie[pixel+2];
+			color += Eddie[pixel+1]*16*16; //desloca 8 bits para esquerda
+			color += Eddie[pixel]*16*16*16*16; //desloca 16 bits para esquerda
 			color += 0x00*16*16*16*16*16*16;
-			if(color != 0x00000000 && color != 0x000000FF){ //não imprime os pixels azuis para dar efeito de fundo transparente
-				GrContextForegroundSet(&sContext, color);
-				draw_pixel(i+40, j+15+22+22+22+22);
+			//não imprime os pixels pretos ou azuis para dar efeito de fundo transparente
+			if(color != 0x00000000 && color != 0x000000FF){ 
+				GrContextForegroundSet(&sContext, 0x000000); // para apagar os pixeis coloridos
+				draw_pixel(i+posicao, j-ALTURA_EDDIE+ESPACO_PONTUACAO+(ALTURA_ANDAR+ESPESSURA_CHAO)*andar);
 			}
 			pixel += 3;
 		}
 	}
 }
 
-void chefao(){
-	uint32_t color = 0x00, i, j, pixel;
+void imprimeEscada(uint32_t andar, uint32_t posicao){
+	uint32_t color = 0xE2697A, i, j, pixel;
+	pixel = Escada_start;
+	for(j = 0; j < ALTURA_ESCADA; j++){ //altura
+		for(i = 0; i < LARGURA_ESCADA; i++){ //largura
+			color = 0x00;
+			color += Escada[pixel+2];
+			color += Escada[pixel+1]*16*16;
+			color += Escada[pixel]*16*16*16*16;
+			color += 0x00*16*16*16*16*16*16;
+			if(color != 0x00000000 && color != 0x000000FF){ //não imprime os pixels azuis para dar efeito de fundo transparente
+				GrContextForegroundSet(&sContext, 0x00AAFF); // imprime cor AZUL
+				draw_pixel(i+posicao, j-ALTURA_ESCADA+ESPACO_PONTUACAO+(ALTURA_ANDAR+ESPESSURA_CHAO)*andar);
+			}
+			pixel += 3;
+		}
+	}
+}
+
+void imprimeChefao(uint32_t posicao){
+	uint32_t color = 0x00, i, j, pixel, andar= 1;
 	pixel = Chefao_start;
-	for(j = 0; j < 14; j++){ //altura
-		for(i = 0; i < 8; i++){ //largura
+	for(j = 0; j < ALTURA_CHEFAO; j++){ //altura
+		for(i = 0; i < LARGURA_CHEFAO; i++){ //largura
 			color = 0x00;
 			color += Chefao[pixel+2];
 			color += Chefao[pixel+1]*16*16;
@@ -280,18 +299,18 @@ void chefao(){
 			color += 0x00*16*16*16*16*16*16;
 			if(color != 0x00000000 && color != 0x000000FF){ //não imprime os pixels azuis para dar efeito de fundo transparente
 				GrContextForegroundSet(&sContext, color);
-				draw_pixel(i+64, j+21);
+				draw_pixel(i+posicao, j-ALTURA_CHEFAO+ESPACO_PONTUACAO+(ALTURA_ANDAR+ESPESSURA_CHAO)*andar);
 			}
 			pixel += 3;
 		}
 	}
 }
 
-void inimigo(){
+void imprimeInimigo(uint32_t andar, uint32_t posicao){
 	uint32_t color = 0x00, i, j, pixel;
 	pixel = Inimigo_start;
-	for(j = 0; j < 5; j++){ //altura
-		for(i = 0; i < 8; i++){ //largura
+	for(j = 0; j < ALTURA_INIMIGO; j++){ //altura
+		for(i = 0; i < LARGURA_INIMIGO; i++){ //largura
 			color = 0x00;
 			color += Inimigo[pixel+2];
 			color += Inimigo[pixel+1]*16*16;
@@ -299,18 +318,18 @@ void inimigo(){
 			color += 0x00*16*16*16*16*16*16;
 			if(color != 0x00000000 && color != 0x000000FF){ //não imprime os pixels azuis para dar efeito de fundo transparente
 				GrContextForegroundSet(&sContext, color);
-				draw_pixel(i+20, j+30+22+22+22);
+				draw_pixel(i+posicao, j-ALTURA_INIMIGO+ESPACO_PONTUACAO+(ALTURA_ANDAR+ESPESSURA_CHAO)*andar);
 			}
 			pixel += 3;
 		}
 	}
 }
 
-void item(){
+void imprimeItem(uint32_t andar, uint32_t posicao){
 	uint32_t color = 0x00, i, j, pixel;
 	pixel = Item_start;
-	for(j = 0; j < 4; j++){ //altura
-		for(i = 0; i < 8; i++){ //largura
+	for(j = 0; j < ALTURA_ITEM; j++){ //altura
+		for(i = 0; i < LARGURA_ITEM; i++){ //largura
 			color = 0x00;
 			color += Item[pixel+2];
 			color += Item[pixel+1]*16*16;
@@ -318,7 +337,7 @@ void item(){
 			color += 0x00*16*16*16*16*16*16;
 			if(color != 0x00000000 && color != 0x000000FF){ //não imprime os pixels azuis para dar efeito de fundo transparente
 				GrContextForegroundSet(&sContext, color);
-				draw_pixel(i+20, j+16+22+22);
+				draw_pixel(i+posicao, j-ALTURA_ITEM-16+ESPACO_PONTUACAO+(ALTURA_ANDAR+ESPESSURA_CHAO)*andar); //não sei porque do 16, mas assim que dá certo
 			}
 			pixel += 3;
 		}
@@ -350,21 +369,43 @@ uint32_t leituraJoystick(){
 
 void movimentaEddie(){
 	if(movimento_eddie == 3){
+		apagaEddie(andar_atual_eddie, x_anterior_eddie);
 		// para cima se houver escada, senão só mexe as perninhas
 	}
 	else if(movimento_eddie == 4){
+		apagaEddie(andar_atual_eddie, x_anterior_eddie);
 		// para baixo se houver escada, senão só mexe as perninhas
 	}
 	else if(movimento_eddie == 2 && x_atual_eddie < 120){
+		apagaEddie(andar_atual_eddie, x_anterior_eddie);
 		x_atual_eddie = x_anterior_eddie + 2;
 	}
 	else if(movimento_eddie == 1 && x_atual_eddie > 0){
+		apagaEddie(andar_atual_eddie, x_anterior_eddie);
 		x_atual_eddie = x_anterior_eddie -2;
 	}
-	apagaEddie(andar_atual_eddie, x_anterior_eddie);
 	imprimeEddie(andar_atual_eddie, x_atual_eddie);
 	x_anterior_eddie = x_atual_eddie;
 }
+
+void inicializaPontuacao(){
+	char pbufx[10];
+	
+	GrContextInit(&sContext, &g_sCfaf128x128x16);
+	
+	GrFlush(&sContext);
+	GrContextFontSet(&sContext, g_psFontFixed6x8);
+	
+	GrContextForegroundSet(&sContext, ClrWhite);
+	GrContextBackgroundSet(&sContext, ClrBlack);
+	
+	intToString(pontos, pbufx, 10, 10, 3);
+	
+	GrContextForegroundSet(&sContext, ClrRed);
+	GrStringDraw(&sContext,(char*)pbufx, -1, (sContext.psFont->ui8MaxWidth)*9,  0, true);
+	GrStringDraw(&sContext,"___", -1, 0, (sContext.psFont->ui8Height+2)*1, true);
+}
+
 /*----------------------------------------------------------------------------
  *      Main
  *---------------------------------------------------------------------------*/
@@ -375,29 +416,41 @@ int main (void) {
 	float temp,lux;
 	float mic;
 	bool s1_press, s2_press;
-	uint32_t i, i_anterior = 0;
+	uint32_t i, j, i_anterior = 0;
 	
+	// Inicialização das variáveis globais
 	movimento_eddie = 0;
 	x_anterior_eddie = X_INICIAL_EDDIE;
 	x_atual_eddie = X_INICIAL_EDDIE;
 	andar_atual_eddie = ANDAR_INICIAL_EDDIE;
+	pontos = 10;
+	posicaoEscadas[0][0] = 5;
+	posicaoEscadas[0][1] = 4;
+	posicaoEscadas[0][2] = 3;
+	posicaoEscadas[0][3] = 2;
+	posicaoEscadas[1][0] = 30;
+	posicaoEscadas[1][1] = 80;
+	posicaoEscadas[1][2] = 60;
+	posicaoEscadas[1][3] = 100;
 	
 	//Initializing all peripherals
 	init_all();
 	SysTick_Init();
-	GrContextInit(&sContext, &g_sCfaf128x128x16);
+	inicializaPontuacao();
 	
 	GrFlush(&sContext);
 	GrContextFontSet(&sContext, g_psFontFixed6x8);
 
   while(1){
 	leituraJoystick();
-	escada();
-	background();
+	imprimeBackground();
+	for(i = 0; i < TOTAL_ESCADAS; i++){
+		imprimeEscada(posicaoEscadas[0][i], posicaoEscadas[1][i]);
+	}
 	movimentaEddie();
-	inimigo();
-	chefao();
-	item();
+	imprimeInimigo(4, 20);
+	imprimeChefao(70);
+	imprimeItem(2, 20);
 	SysTick_Wait1ms(50);
 		
 	}	
