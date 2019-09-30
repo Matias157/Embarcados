@@ -41,6 +41,7 @@
 #define ALTURA_EDDIE			14
 #define LARGURA_EDDIE			8
 #define X_INICIAL_EDDIE		64
+#define Y_INICIAL_EDDIE		0
 #define ANDAR_INICIAL_EDDIE		5
 #define ALTURA_ESCADA			20
 #define LARGURA_ESCADA		17
@@ -63,9 +64,12 @@ void SysTick_Wait1us(uint32_t delay);
 //***************** Variáveis globais  ***************************************
 uint32_t movimento_eddie;
 uint32_t x_anterior_eddie, x_atual_eddie;
+uint32_t y_anterior_eddie, y_atual_eddie;
 uint32_t andar_atual_eddie;
 uint32_t posicaoEscadas[2][4];
 uint16_t pontos;
+bool pulo = 0; // se for 1 pula
+bool subida_ou_descida; // subida = 1, descida = 0
 
 /*----------------------------------------------------------------------------
  *  Transforming int to string
@@ -226,7 +230,7 @@ void imprimeBackground(){
 
 // andar mais alto é o 1, o mais baixo é o 5
 // posicao é o tamanho da largura da tela menos a largura do eddie (0 a 120)
-void imprimeEddie(uint32_t andar, uint32_t posicao){
+void imprimeEddie(uint32_t andar, uint32_t posicao_x, uint32_t posicao_y){
 	uint32_t color = 0x00, i, j, pixel;
 	pixel = Eddie_start;
 	for(j = 0; j < ALTURA_EDDIE; j++){ //altura
@@ -239,16 +243,18 @@ void imprimeEddie(uint32_t andar, uint32_t posicao){
 			//não imprime os pixels pretos ou azuis para dar efeito de fundo transparente
 			if(color != 0x00000000 && color != 0x000000FF){ 
 				GrContextForegroundSet(&sContext, color);
-				draw_pixel(i+posicao, j-ALTURA_EDDIE+ESPACO_PONTUACAO+(ALTURA_ANDAR+ESPESSURA_CHAO)*andar);
+				draw_pixel(i+posicao_x, j-posicao_y-ALTURA_EDDIE+ESPACO_PONTUACAO+(ALTURA_ANDAR+ESPESSURA_CHAO)*andar);
 			}
 			pixel += 3;
 		}
 	}
+
+	
 }
 
 // andar mais alto é o 1, o mais baixo é o 5
 // posicao é o tamanho da largura da tela menos a largura do eddie (0 a 120)
-void apagaEddie(uint32_t andar, uint32_t posicao){
+void apagaEddie(uint32_t andar, uint32_t posicao_x, uint32_t posicao_y){
 	uint32_t color = 0xFF, i, j, pixel;
 	pixel = Eddie_start;
 	for(j = 0; j < ALTURA_EDDIE; j++){ //altura
@@ -261,7 +267,7 @@ void apagaEddie(uint32_t andar, uint32_t posicao){
 			//não imprime os pixels pretos ou azuis para dar efeito de fundo transparente
 			if(color != 0x00000000 && color != 0x000000FF){ 
 				GrContextForegroundSet(&sContext, 0x000000); // para apagar os pixeis coloridos
-				draw_pixel(i+posicao, j-ALTURA_EDDIE+ESPACO_PONTUACAO+(ALTURA_ANDAR+ESPESSURA_CHAO)*andar);
+				draw_pixel(i+posicao_x, j-posicao_y-ALTURA_EDDIE+ESPACO_PONTUACAO+(ALTURA_ANDAR+ESPESSURA_CHAO)*andar);
 			}
 			pixel += 3;
 		}
@@ -284,6 +290,13 @@ void imprimeEscada(uint32_t andar, uint32_t posicao){
 			}
 			pixel += 3;
 		}
+	}
+}
+
+void imprimeEscadas(){
+	int i;
+	for(i = 0; i < TOTAL_ESCADAS; i++){
+		imprimeEscada(posicaoEscadas[0][i], posicaoEscadas[1][i]);
 	}
 }
 
@@ -347,50 +360,96 @@ void imprimeItem(uint32_t andar, uint32_t posicao){
 uint32_t leituraJoystick(){
 	// início seção crítica
 	int x, y;
-	x = joy_read_x();
-	y = joy_read_y();
-	x = x*200/0xFFF-100; 
-	y = y*200/0xFFF-100;
-	if (x<-50 && y>-50 && y<50){
-		movimento_eddie = 1;						//esquerda
-	}
-	else if (x>50 && y>-50 && y<50){
-		movimento_eddie = 2;						//direita
-	}
-	else if (y<-50 && x>-50 && x<50){
-		movimento_eddie = 3;						//baixo
-	}
-	else if (y>50 && x>-50 && x<50){
-		movimento_eddie = 4;						//cima
-	}
-	else{
-		movimento_eddie = 0;
+	if(pulo == 0){
+		x = joy_read_x();
+		y = joy_read_y();
+		x = x*200/0xFFF-100; 
+		y = y*200/0xFFF-100;
+		if (x<-50 && y>-50 && y<50){
+			movimento_eddie = 1;						//esquerda
+		}
+		else if (x>50 && y>-50 && y<50){
+			movimento_eddie = 2;						//direita
+		}
+		else if (y<-50 && x>-50 && x<50){
+			movimento_eddie = 3;						//baixo
+		}
+		else if (y>50 && x>-50 && x<50){
+			movimento_eddie = 4;						//cima
+		}
+		else{
+			movimento_eddie = 0;
+		}
 	}
 	// fim seção crítica
 }
 
+uint32_t leituraBotao(){
+	// início seção crítica
+	
+	bool s1_press;
+	s1_press = button_read_s1();
+	
+	if (s1_press && pulo == 0){ // verificar se isso será necessário com a implementação do mutex
+		pulo = 1;		
+		subida_ou_descida = 1;
+	}
+	
+	// fim seção crítica
+}
+
+
 void movimentaEddie(){
 	// início seção crítica
+	if(pulo == 1 && subida_ou_descida == 1){
+		if(y_atual_eddie < 6){
+			y_atual_eddie = y_anterior_eddie + 2;
+		}
+		else{
+			y_atual_eddie = y_anterior_eddie - 2;
+			subida_ou_descida = 0;
+		}
+	}
+	else if(pulo == 1 && subida_ou_descida == 0){
+		if(y_atual_eddie > 0){
+			y_atual_eddie = y_anterior_eddie - 2;
+		}
+		else{
+			pulo = 0;
+			y_atual_eddie = 0;
+		}
+	}
+	else{
+		y_atual_eddie = 0;
+	}
+	
 	if(movimento_eddie == 3){
-		apagaEddie(andar_atual_eddie, x_anterior_eddie);
+		apagaEddie(andar_atual_eddie, x_anterior_eddie, y_anterior_eddie);
 		// para cima se houver escada, senão só mexe as perninhas
 	}
 	else if(movimento_eddie == 4){
-		apagaEddie(andar_atual_eddie, x_anterior_eddie);
+		apagaEddie(andar_atual_eddie, x_anterior_eddie, y_anterior_eddie);
 		// para baixo se houver escada, senão só mexe as perninhas
 	}
 	else if(movimento_eddie == 2 && x_atual_eddie < 120){
-		apagaEddie(andar_atual_eddie, x_anterior_eddie);
+		apagaEddie(andar_atual_eddie, x_anterior_eddie, y_anterior_eddie);
 		x_atual_eddie = x_anterior_eddie + 2;
 	}
 	else if(movimento_eddie == 1 && x_atual_eddie > 0){
-		apagaEddie(andar_atual_eddie, x_anterior_eddie);
+		apagaEddie(andar_atual_eddie, x_anterior_eddie, y_anterior_eddie);
 		x_atual_eddie = x_anterior_eddie -2;
 	}
-	imprimeEddie(andar_atual_eddie, x_atual_eddie);
+	else{
+		apagaEddie(andar_atual_eddie, x_anterior_eddie, y_anterior_eddie);
+	}
+	imprimeEscada(posicaoEscadas[0][andar_atual_eddie - 2], posicaoEscadas[1][andar_atual_eddie - 2]);
+	imprimeEddie(andar_atual_eddie, x_atual_eddie, y_atual_eddie);
 	x_anterior_eddie = x_atual_eddie;
+	y_anterior_eddie = y_atual_eddie;
 	// fim seção crítica
 }
+
+
 
 void inicializaPontuacao(){
 	char pbufx[10];
@@ -428,14 +487,14 @@ int main (void) {
 	x_atual_eddie = X_INICIAL_EDDIE;
 	andar_atual_eddie = ANDAR_INICIAL_EDDIE;
 	pontos = 10;
-	posicaoEscadas[0][0] = 5;
-	posicaoEscadas[0][1] = 4;
-	posicaoEscadas[0][2] = 3;
-	posicaoEscadas[0][3] = 2;
-	posicaoEscadas[1][0] = 30;
-	posicaoEscadas[1][1] = 80;
-	posicaoEscadas[1][2] = 60;
-	posicaoEscadas[1][3] = 100;
+	posicaoEscadas[0][3] = 5;
+	posicaoEscadas[0][2] = 4;
+	posicaoEscadas[0][1] = 3;
+	posicaoEscadas[0][0] = 2;
+	posicaoEscadas[1][3] = 30;
+	posicaoEscadas[1][2] = 80;
+	posicaoEscadas[1][1] = 60;
+	posicaoEscadas[1][0] = 100;
 	
 	//Initializing all peripherals
 	init_all();
@@ -446,16 +505,15 @@ int main (void) {
 	GrContextFontSet(&sContext, g_psFontFixed6x8);
 
   while(1){
-	leituraJoystick();
-	imprimeBackground();
-	for(i = 0; i < TOTAL_ESCADAS; i++){
-		imprimeEscada(posicaoEscadas[0][i], posicaoEscadas[1][i]);
-	}
-	movimentaEddie();
-	imprimeInimigo(4, 20);
-	imprimeChefao(70);
-	imprimeItem(2, 20);
-	SysTick_Wait1ms(50);
+		leituraJoystick();
+		leituraBotao();
+		imprimeBackground();
+		imprimeEscadas();
+		movimentaEddie(); // apaga eddie, imprime escadas, imprime eddie
+		imprimeInimigo(4, 20);
+		imprimeChefao(70);
+		imprimeItem(2, 20);
+		SysTick_Wait1ms(20);
 		
 	}	
 }
