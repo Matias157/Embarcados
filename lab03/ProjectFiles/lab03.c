@@ -345,6 +345,7 @@ void imprimeItem(uint32_t andar, uint32_t posicao){
 }
 
 uint32_t leituraJoystick(){
+	// início seção crítica
 	int x, y;
 	x = joy_read_x();
 	y = joy_read_y();
@@ -365,9 +366,11 @@ uint32_t leituraJoystick(){
 	else{
 		movimento_eddie = 0;
 	}
+	// fim seção crítica
 }
 
 void movimentaEddie(){
+	// início seção crítica
 	if(movimento_eddie == 3){
 		apagaEddie(andar_atual_eddie, x_anterior_eddie);
 		// para cima se houver escada, senão só mexe as perninhas
@@ -386,6 +389,7 @@ void movimentaEddie(){
 	}
 	imprimeEddie(andar_atual_eddie, x_atual_eddie);
 	x_anterior_eddie = x_atual_eddie;
+	// fim seção crítica
 }
 
 void inicializaPontuacao(){
@@ -403,7 +407,7 @@ void inicializaPontuacao(){
 	
 	GrContextForegroundSet(&sContext, ClrRed);
 	GrStringDraw(&sContext,(char*)pbufx, -1, (sContext.psFont->ui8MaxWidth)*9,  0, true);
-	GrStringDraw(&sContext,"___", -1, 0, (sContext.psFont->ui8Height+2)*1, true);
+	GrStringDraw(&sContext,"___", -1, 0, (sContext.psFont->ui8Height+2)*9, true);
 }
 
 /*----------------------------------------------------------------------------
