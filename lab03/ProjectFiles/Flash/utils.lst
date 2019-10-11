@@ -352,8 +352,8 @@ ARM Macro Assembler    Page 6
               00013880 
 Command Line: --debug --xref --diag_suppress=9931 --cpu=Cortex-M4.fp --apcs=int
 erwork --depend=.\flash\utils.d -o.\flash\utils.o -I.\RTE\_TM4C129_Flash -IC:\K
-eil_v5\ARM\PACK\ARM\CMSIS\5.4.0\CMSIS\Core\Include -IC:\Keil_v5\ARM\PACK\ARM\CM
-SIS\5.4.0\CMSIS\RTOS\RTX\INC -IC:\Keil_v5\ARM\PACK\Keil\TM4C_DFP\1.1.0\Device\I
+eil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\Core\Include -IC:\Keil_v5\ARM\PACK\ARM\CM
+SIS\5.5.1\CMSIS\RTOS\RTX\INC -IC:\Keil_v5\ARM\PACK\Keil\TM4C_DFP\1.1.0\Device\I
 nclude\TM4C129 --predefine="__RTX SETA 1" --predefine="__UVISION_VERSION SETA 5
 26" --predefine="_RTE_ SETA 1" --predefine="TM4C1294NCPDT SETA 1" --list=.\flas
 h\utils.lst utils.s

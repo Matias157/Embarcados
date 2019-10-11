@@ -10,7 +10,7 @@
 .\flash\buttons.o: ..\driverlib/pin_map.h
 .\flash\buttons.o: ..\driverlib/rom.h
 .\flash\buttons.o: ..\driverlib/pwm.h
-.\flash\buttons.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.4.0\CMSIS\RTOS\RTX\INC\cmsis_os.h
+.\flash\buttons.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\RTOS\RTX\INC\cmsis_os.h
 .\flash\buttons.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 .\flash\buttons.o: ..\grlib/grlib.h
 .\flash\buttons.o: cfaf128x128x16.h
