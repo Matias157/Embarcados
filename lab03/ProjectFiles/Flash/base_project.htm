@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Flash\base_project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Flash\base_project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Sat Oct 12 16:06:32 2019
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Sat Oct 12 16:16:55 2019
 <BR><P>
 <H3>Maximum Stack Usage =        152 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -571,20 +571,24 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> lab03.o(.constdata)
 </UL>
-<P><STRONG><a name="[a0]"></a>somSubirEscada</STRONG> (Thumb, 142 bytes, Stack size 0 bytes, lab03.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = somSubirEscada &rArr; buzzer_per_set &rArr; buzzer_vol_set
+<P><STRONG><a name="[a0]"></a>somSubirEscada</STRONG> (Thumb, 172 bytes, Stack size 16 bytes, lab03.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = somSubirEscada &rArr; buzzer_per_set &rArr; buzzer_vol_set
 </UL>
-<BR>[Calls]<UL><LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
+<BR>[Calls]<UL><LI><a href="#[da]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osSignalWait
+<LI><a href="#[db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osSignalClear
+<LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
 <LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;buzzer_write
 <LI><a href="#[dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;buzzer_vol_set
 <LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;buzzer_per_set
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> lab03.o(.constdata)
 </UL>
-<P><STRONG><a name="[a1]"></a>somFimGame</STRONG> (Thumb, 238 bytes, Stack size 0 bytes, lab03.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = somFimGame &rArr; buzzer_per_set &rArr; buzzer_vol_set
+<P><STRONG><a name="[a1]"></a>somFimGame</STRONG> (Thumb, 262 bytes, Stack size 16 bytes, lab03.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = somFimGame &rArr; buzzer_per_set &rArr; buzzer_vol_set
 </UL>
-<BR>[Calls]<UL><LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
+<BR>[Calls]<UL><LI><a href="#[da]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osSignalWait
+<LI><a href="#[db]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osSignalClear
+<LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
 <LI><a href="#[de]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;buzzer_write
 <LI><a href="#[dc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;buzzer_vol_set
 <LI><a href="#[dd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;buzzer_per_set
@@ -642,7 +646,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gameStart
 </UL>
 
-<P><STRONG><a name="[e7]"></a>apagaChefao</STRONG> (Thumb, 66 bytes, Stack size 32 bytes, lab03.o(.text))
+<P><STRONG><a name="[e7]"></a>apagaChefao</STRONG> (Thumb, 94 bytes, Stack size 32 bytes, lab03.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = apagaChefao &rArr; draw_pixel
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;draw_pixel
@@ -669,7 +673,7 @@ Global Symbols
 <LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;movimentaInimigo0
 </UL>
 
-<P><STRONG><a name="[ea]"></a>imprimeInimigo</STRONG> (Thumb, 160 bytes, Stack size 40 bytes, lab03.o(.text))
+<P><STRONG><a name="[ea]"></a>imprimeInimigo</STRONG> (Thumb, 116 bytes, Stack size 40 bytes, lab03.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = imprimeInimigo &rArr; draw_pixel
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;draw_pixel
@@ -720,7 +724,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> lab03.o(.constdata)
 </UL>
-<P><STRONG><a name="[97]"></a>movimentaEddie</STRONG> (Thumb, 628 bytes, Stack size 24 bytes, lab03.o(.text))
+<P><STRONG><a name="[97]"></a>movimentaEddie</STRONG> (Thumb, 644 bytes, Stack size 24 bytes, lab03.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = movimentaEddie &rArr; imprimeEscada &rArr; draw_pixel
 </UL>
 <BR>[Calls]<UL><LI><a href="#[da]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osSignalWait
@@ -837,7 +841,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;gameStart
 </UL>
 
-<P><STRONG><a name="[fa]"></a>imprimePontuacao</STRONG> (Thumb, 590 bytes, Stack size 64 bytes, lab03.o(.text))
+<P><STRONG><a name="[fa]"></a>imprimePontuacao</STRONG> (Thumb, 592 bytes, Stack size 64 bytes, lab03.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 72<LI>Call Chain = imprimePontuacao &rArr; draw_pixel
 </UL>
 <BR>[Calls]<UL><LI><a href="#[e1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;draw_pixel
@@ -2405,6 +2409,8 @@ Global Symbols
 <LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;movimentaEddie
 <LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;leituraBotao
 <LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;leituraJoystick
+<LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;somFimGame
+<LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;somSubirEscada
 <LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;somPulo
 </UL>
 
@@ -2430,6 +2436,8 @@ Global Symbols
 <LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;movimentaEddie
 <LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;leituraBotao
 <LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;leituraJoystick
+<LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;somFimGame
+<LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;somSubirEscada
 <LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;somPulo
 </UL>
 

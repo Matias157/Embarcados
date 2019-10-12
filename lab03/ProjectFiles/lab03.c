@@ -386,6 +386,8 @@ void somPulo(void const *argument){
 
 void somSubirEscada(void const *argument){
 	while(1){
+		osSignalWait(0x01,osWaitForever); //espera o signal para continuar
+		osSignalClear(somSubirEscada_ID,0x01); //limpa o signal
 		buzzer_vol_set(5000);
 		buzzer_per_set(2551);
 		buzzer_write(true);
@@ -410,6 +412,8 @@ void somSubirEscada(void const *argument){
 
 void somFimGame(void const *argument){
 	while(1){
+		osSignalWait(0x01,osWaitForever); //espera o signal para continuar
+		osSignalClear(somFimGame_ID,0x01); //limpa o signal
 		buzzer_vol_set(5000);
 		buzzer_per_set(2000);
 		buzzer_write(true);
