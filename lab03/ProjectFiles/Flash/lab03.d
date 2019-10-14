@@ -1,4 +1,5 @@
 .\flash\lab03.o: lab03.c
+.\flash\lab03.o: fast_eddie.h
 .\flash\lab03.o: C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\RTOS\RTX\INC\cmsis_os.h
 .\flash\lab03.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 .\flash\lab03.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
@@ -22,3 +23,5 @@
 .\flash\lab03.o: Item.h
 .\flash\lab03.o: Background.h
 .\flash\lab03.o: Numeros.h
+.\flash\lab03.o: Chave.h
+.\flash\lab03.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h

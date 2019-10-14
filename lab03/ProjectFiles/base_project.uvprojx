@@ -387,6 +387,16 @@
               <FileType>1</FileType>
               <FilePath>.\lab03.c</FilePath>
             </File>
+            <File>
+              <FileName>fast_eddie.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\fast_eddie.c</FilePath>
+            </File>
+            <File>
+              <FileName>fast_eddie.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\fast_eddie.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -516,6 +526,11 @@
               <FileName>Numeros.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GameSprites\Numeros\Numeros.c</FilePath>
+            </File>
+            <File>
+              <FileName>Chave.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GameSprites\Chave\Chave.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -911,6 +926,16 @@
               <FileType>1</FileType>
               <FilePath>.\lab03.c</FilePath>
             </File>
+            <File>
+              <FileName>fast_eddie.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\fast_eddie.c</FilePath>
+            </File>
+            <File>
+              <FileName>fast_eddie.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\fast_eddie.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1040,6 +1065,11 @@
               <FileName>Numeros.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GameSprites\Numeros\Numeros.c</FilePath>
+            </File>
+            <File>
+              <FileName>Chave.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GameSprites\Chave\Chave.c</FilePath>
             </File>
           </Files>
         </Group>

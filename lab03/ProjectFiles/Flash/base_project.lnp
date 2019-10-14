@@ -1,5 +1,6 @@
 --cpu=Cortex-M4.fp
 ".\flash\lab03.o"
+".\flash\fast_eddie.o"
 ".\flash\buzzer.o"
 ".\flash\accel.o"
 ".\flash\buttons.o"
@@ -21,6 +22,7 @@
 ".\flash\item.o"
 ".\flash\background.o"
 ".\flash\numeros.o"
+".\flash\chave_1.o"
 "C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.5.1\CMSIS\RTOS\RTX\LIB\ARM\RTX_CM4.lib"
 ".\flash\rtx_conf_cm.o"
 ".\flash\startup_tm4c129.o"
