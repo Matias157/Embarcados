@@ -222,7 +222,7 @@ void init_sidelong_menu(){
 int main (void) {
 	char buff[10];
 	
-	UART_Enable();
+	UARTenable();
 	
 	osKernelInitialize();
 	

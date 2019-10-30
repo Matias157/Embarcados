@@ -22,3 +22,11 @@
 .\flash\exemplotiva.o: ..\driverlib/rom_map.h
 .\flash\exemplotiva.o: ..\utils/uartstdio.h
 .\flash\exemplotiva.o: PWM/PWM.h
+.\flash\exemplotiva.o: ..\inc/hw_ints.h
+.\flash\exemplotiva.o: ..\inc/hw_types.h
+.\flash\exemplotiva.o: ..\inc/hw_pwm.h
+.\flash\exemplotiva.o: ..\inc/hw_memmap.h
+.\flash\exemplotiva.o: ..\inc/hw_gpio.h
+.\flash\exemplotiva.o: ..\inc/hw_sysctl.h
+.\flash\exemplotiva.o: ..\driverlib/pwm.h
+.\flash\exemplotiva.o: ..\driverlib/interrupt.h

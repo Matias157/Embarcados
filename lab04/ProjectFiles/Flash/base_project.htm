@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Flash\base_project.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Flash\base_project.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Mon Oct 28 16:57:12 2019
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Tue Oct 29 16:25:40 2019
 <BR><P>
 <H3>Maximum Stack Usage =        144 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -295,8 +295,8 @@ Function Pointers
 Global Symbols
 </H3>
 <P><STRONG><a name="[95]"></a>__main</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, __main.o(!!!main))
-<BR><BR>[Calls]<UL><LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__scatterload
-<LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry
+<BR><BR>[Calls]<UL><LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry
+<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__scatterload
 </UL>
 
 <P><STRONG><a name="[9b]"></a>__scatterload</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __scatter.o(!!!scatter))
@@ -386,8 +386,8 @@ Global Symbols
 <P><STRONG><a name="[13f]"></a>__rt_lib_shutdown_user_alloc_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, libshutdown2.o(.ARM.Collect$$libshutdown$$0000000C))
 
 <P><STRONG><a name="[9c]"></a>__rt_entry</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry.o(.ARM.Collect$$rtentry$$00000000))
-<BR><BR>[Called By]<UL><LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__scatterload_rt2
-<LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__main
+<BR><BR>[Called By]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__main
+<LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__scatterload_rt2
 </UL>
 
 <P><STRONG><a name="[140]"></a>__rt_entry_presh_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$00000002))
@@ -450,7 +450,7 @@ Global Symbols
 <BR><BR>[Calls]<UL><LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysCtlDelay
 </UL>
 <BR>[Called By]<UL><LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysCtlDelay
-<LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Enable
+<LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTenable
 </UL>
 
 <P><STRONG><a name="[143]"></a>rt_set_PSP</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, hal_cm4.o(.emb_text), UNUSED)
@@ -519,7 +519,7 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osKernelStart
 <LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osKernelInitialize
 <LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;osDelay
-<LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Enable
+<LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTenable
 <LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_sidelong_menu
 <LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_all
 </UL>
@@ -612,37 +612,35 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;init_all
 </UL>
 
-<P><STRONG><a name="[d0]"></a>UART_Send</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, uart.o(.text))
-<BR><BR>[Called By]<UL><LI><a href="#[cf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_printstring
+<P><STRONG><a name="[d0]"></a>UARTsend</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, uart.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[cf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTprintString
 </UL>
 
-<P><STRONG><a name="[cf]"></a>UART_printstring</STRONG> (Thumb, 20 bytes, Stack size 4 bytes, uart.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = UART_printstring
+<P><STRONG><a name="[cf]"></a>UARTprintString</STRONG> (Thumb, 20 bytes, Stack size 4 bytes, uart.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = UARTprintString
 </UL>
-<BR>[Calls]<UL><LI><a href="#[d0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Send
+<BR>[Calls]<UL><LI><a href="#[d0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTsend
 </UL>
-<BR>[Called By]<UL><LI><a href="#[d1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_printMenu
-<LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Enable
-</UL>
-
-<P><STRONG><a name="[148]"></a>UART_Receive</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, uart.o(.text), UNUSED)
-
-<P><STRONG><a name="[d1]"></a>UART_printMenu</STRONG> (Thumb, 70 bytes, Stack size 4 bytes, uart.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = UART_printMenu &rArr; UART_printstring
-</UL>
-<BR>[Calls]<UL><LI><a href="#[cf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_printstring
-</UL>
-<BR>[Called By]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Enable
+<BR>[Called By]<UL><LI><a href="#[d1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTprintMenu
+<LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTenable
 </UL>
 
-<P><STRONG><a name="[bd]"></a>UART_Enable</STRONG> (Thumb, 168 bytes, Stack size 24 bytes, uart.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 60<LI>Call Chain = UART_Enable &rArr; GPIOPinTypeUART &rArr; GPIOPadConfigSet
+<P><STRONG><a name="[d1]"></a>UARTprintMenu</STRONG> (Thumb, 70 bytes, Stack size 4 bytes, uart.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = UARTprintMenu &rArr; UARTprintString
+</UL>
+<BR>[Calls]<UL><LI><a href="#[cf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTprintString
+</UL>
+<BR>[Called By]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTenable
+</UL>
+
+<P><STRONG><a name="[bd]"></a>UARTenable</STRONG> (Thumb, 168 bytes, Stack size 24 bytes, uart.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 60<LI>Call Chain = UARTenable &rArr; GPIOPinTypeUART &rArr; GPIOPadConfigSet
 </UL>
 <BR>[Calls]<UL><LI><a href="#[d6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTEnable
 <LI><a href="#[d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTConfigSetExpClk
 <LI><a href="#[d4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIOPinTypeUART
-<LI><a href="#[d1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_printMenu
-<LI><a href="#[cf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_printstring
+<LI><a href="#[d1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTprintMenu
+<LI><a href="#[cf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTprintString
 <LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysCtlDelay
 <LI><a href="#[ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysCtlClockFreqSet
 <LI><a href="#[d2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysCtlPeripheralEnable
@@ -650,6 +648,8 @@ Global Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
+
+<P><STRONG><a name="[148]"></a>UARTreceive</STRONG> (Thumb, 14 bytes, Stack size 0 bytes, uart.o(.text), UNUSED)
 
 <P><STRONG><a name="[89]"></a>os_idle_demon</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, rtx_conf_cm_1.o(.text))
 <BR><BR>[Calls]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;os_idle_demon
@@ -1626,7 +1626,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[d3]"></a>GPIOPinConfigure</STRONG> (Thumb, 60 bytes, Stack size 0 bytes, gpio.o(i.GPIOPinConfigure))
-<BR><BR>[Called By]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Enable
+<BR><BR>[Called By]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTenable
 </UL>
 
 <P><STRONG><a name="[d4]"></a>GPIOPinTypeUART</STRONG> (Thumb, 28 bytes, Stack size 12 bytes, gpio.o(i.GPIOPinTypeUART))
@@ -1635,7 +1635,7 @@ Global Symbols
 <BR>[Calls]<UL><LI><a href="#[e9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIOPadConfigSet
 <LI><a href="#[e8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIODirModeSet
 </UL>
-<BR>[Called By]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Enable
+<BR>[Called By]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTenable
 </UL>
 
 <P><STRONG><a name="[bc]"></a>GrContextFontSet</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, string.o(i.GrContextFontSet))
@@ -1681,22 +1681,22 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = SysCtlClockFreqSet
 </UL>
 <BR>[Called By]<UL><LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitSSICom
-<LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Enable
+<LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTenable
 </UL>
 
 <P><STRONG><a name="[d2]"></a>SysCtlPeripheralEnable</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, sysctl.o(i.SysCtlPeripheralEnable))
-<BR><BR>[Called By]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Enable
+<BR><BR>[Called By]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTenable
 </UL>
 
 <P><STRONG><a name="[d5]"></a>UARTConfigSetExpClk</STRONG> (Thumb, 110 bytes, Stack size 0 bytes, uart.o(i.UARTConfigSetExpClk))
 <BR><BR>[Calls]<UL><LI><a href="#[d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTConfigSetExpClk
 </UL>
 <BR>[Called By]<UL><LI><a href="#[d5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTConfigSetExpClk
-<LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Enable
+<LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTenable
 </UL>
 
 <P><STRONG><a name="[d6]"></a>UARTEnable</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, uart.o(i.UARTEnable))
-<BR><BR>[Called By]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_Enable
+<BR><BR>[Called By]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UARTenable
 </UL>
 
 <P><STRONG><a name="[10f]"></a>_init_box</STRONG> (Thumb, 70 bytes, Stack size 8 bytes, rt_membox.o(i._init_box))

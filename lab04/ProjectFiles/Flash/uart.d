@@ -1,5 +1,5 @@
 .\flash\uart.o: UART\UART.c
-.\flash\uart.o: UART\uart.h
+.\flash\uart.o: UART\UART.h
 .\flash\uart.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 .\flash\uart.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\flash\uart.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
