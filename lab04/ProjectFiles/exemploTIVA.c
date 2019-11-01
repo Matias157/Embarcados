@@ -14,6 +14,7 @@
 #include "cmsis_os.h"
 #include "TM4C129.h"                    // Device header
 #include <stdbool.h>
+#include <math.h>
 #include "grlib/grlib.h"
 
 /*----------------------------------------------------------------------------
@@ -24,63 +25,45 @@
 #include "UART/UART.h"
 #include "PWM/PWM.h"
 
-#define LED_A      0
-#define LED_B      1
-#define LED_C      2
-#define LED_D      3
-#define LED_CLK    7
-#define osFeature_SysTick 1
-
-//Functions in assembly
-void SysTick_Init(void);
-void SysTick_Wait1ms(uint32_t delay);
-void SysTick_Wait1us(uint32_t delay);
-
 //To print on the screen
 tContext sContext;
 
 //Variaveis compartilhadas
 
 
-////Criacao das threads
-//void gerarPrimos(void const *argument);
-//void decodifica(void const *argument);
-//void testaPenultimo(void const *argument);
-//void testaUltimo(void const *argument);
-//void mostraDisplay(void const *argument);
+//Criacao das threads
+void geradorOnda(void const *argument);
+void PWM(void const *argument);
+void UART(void const *argument);
+void mostraDisplay(void const *argument);
 
-////Varivel que determina ID das threads
-//osThreadId gerarPrimos_ID; 
-//osThreadId decodifica_ID; 
-//osThreadId testaPenultimo_ID; 
-//osThreadId testaUltimo_ID; 
-//osThreadId mostraDisplay_ID;  
+//Varivel que determina ID das threads
+osThreadId geradorOnda_ID; 
+osThreadId PWM_ID; 
+osThreadId UART_ID; 
+osThreadId mostraDisplay_ID;   
 
-////Definicao das threads
-//osThreadDef (gerarPrimos, osPriorityNormal, 1, 0);     // thread object
-//osThreadDef (decodifica, osPriorityNormal, 1, 0);     // thread object
-//osThreadDef (testaPenultimo, osPriorityNormal, 1, 0);     // thread object
-//osThreadDef (testaUltimo, osPriorityNormal, 1, 0);     // thread object
-//osThreadDef (mostraDisplay, osPriorityNormal, 1, 0);     // thread object
+//Definicao das threads
+osThreadDef (geradorOnda, osPriorityNormal, 1, 0);     // thread object
+osThreadDef (PWM, osPriorityNormal, 1, 0);     // thread object
+osThreadDef (UART, osPriorityNormal, 1, 0);     // thread object
+osThreadDef (mostraDisplay, osPriorityNormal, 1, 0);     // thread object
 
-//int Init_Thread (void) {
-//	gerarPrimos_ID = osThreadCreate (osThread(gerarPrimos), NULL);
-//	if (!gerarPrimos_ID) return(-1);
-//	
-//	decodifica_ID = osThreadCreate (osThread(decodifica), NULL);
-//	if (!decodifica_ID) return(-1);
-//	
-//	testaPenultimo_ID = osThreadCreate (osThread(testaPenultimo), NULL);
-//	if (!testaPenultimo_ID) return(-1);
-//	
-//	testaUltimo_ID = osThreadCreate (osThread(testaUltimo), NULL);
-//	if (!testaUltimo_ID) return(-1);
-//	
-//	testaPenultimo_ID = osThreadCreate (osThread(mostraDisplay), NULL); 
-//	if (!mostraDisplay_ID) return(-1);
-//	
-//  return(0);
-//}
+int Init_Thread (void) {
+	geradorOnda_ID = osThreadCreate (osThread(geradorOnda), NULL);
+	if (!geradorOnda_ID) return(-1);
+	
+	PWM_ID = osThreadCreate (osThread(PWM), NULL);
+	if (!PWM_ID) return(-1);
+	
+	UART_ID = osThreadCreate (osThread(UART), NULL);
+	if (!UART_ID) return(-1);
+	
+	mostraDisplay_ID = osThreadCreate (osThread(mostraDisplay), NULL);
+	if (!mostraDisplay_ID) return(-1);
+	
+  return(0);
+}
 
 /*----------------------------------------------------------------------------
  *  Transforming int to string
@@ -178,6 +161,7 @@ static void floatToString(float value, char *pBuf, uint32_t len, uint32_t base, 
 
 void init_all(){
 	cfaf128x128x16Init();	
+	PWM_function_init();
 }
 
 void draw_pixel(uint16_t x, uint16_t y){
@@ -214,23 +198,55 @@ void init_sidelong_menu(){
  *    Threads
  *---------------------------------------------------------------------------*/
 
+void geradorOnda(void const *argument){
+}
+	
+void UART(void const *argument){
+}
 
+void mostraDisplay(void const *argument){
+}
+
+void PWM(void const *argument){
+	uint16_t amp = 28;
+	uint8_t data = 64;
+	double pi = 3.1415926;
+	float tempo = 0;
+	float tempo_inc = 0;
+	uint16_t val;
+	uint32_t cycles;
+	char tempo_char[5];
+	uint32_t clock = osKernelSysTickFrequency;
+	PWM_per_set(200);
+	PWM_enable(true);
+	while(true){
+		tempo_inc = (float)osKernelSysTick();
+		tempo_inc -= (float) cycles;
+		tempo_inc = (float)tempo_inc/clock;
+		tempo += tempo_inc;	
+		cycles = osKernelSysTick();	
+		data = amp*sin(tempo*2.0*pi*(29/7))+85;
+		//data = amp*sin(tempo*2.0*pi*29);
+		//if(data <= 0)
+		//		data = amp + 85  ;
+		//else
+		//if(data > 0)
+		//		data = 85 - amp ;
+		val = 1020*abs(120-data);
+		PWM_amplitude_set(val);
+	}
+}
 
 /*----------------------------------------------------------------------------
  *      Main
  *---------------------------------------------------------------------------*/
-int main (void) {
-	char buff[10];
-	
-	UARTenable();
-	
+int main (void) {	
 	osKernelInitialize();
 	
 	init_all();
-	init_sidelong_menu();
 	
-//	if(Init_Thread()==0)
-//		return 0;
+	if(Init_Thread()==0)
+		return 0;
 	
 	osKernelStart(); 
 	osDelay(osWaitForever);
