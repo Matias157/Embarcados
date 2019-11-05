@@ -141,15 +141,13 @@ C:\Users\Alexa\Embarcados\lab04\inc\hw_memmap.h(148): warning:  #47-D: incompati
   #define NVIC_BASE               0xE000E000  // Nested Vectored Interrupt Ctrl
 C:\Users\Alexa\Embarcados\lab04\ProjectFiles\PWM\PWM.h(36): warning:  #1-D: last line of file ends without a newline
   void PWM_per_set(uint16_t period);
-C:\Users\Alexa\Embarcados\lab04\ProjectFiles\exemploTIVA.c(228): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-                data = amp*sin(tempo*2.0*pi*(29/7))+85;
-C:\Users\Alexa\Embarcados\lab04\ProjectFiles\exemploTIVA.c(218): warning:  #177-D: variable "tempo_char"  was declared but never referenced
+C:\Users\Alexa\Embarcados\lab04\ProjectFiles\exemploTIVA.c(241): warning:  #177-D: variable "tempo_char"  was declared but never referenced
         char tempo_char[5];
-C:\Users\Alexa\Embarcados\lab04\ProjectFiles\exemploTIVA.c(253): warning:  #1-D: last line of file ends without a newline
+C:\Users\Alexa\Embarcados\lab04\ProjectFiles\exemploTIVA.c(278): warning:  #1-D: last line of file ends without a newline
   }
 C:\Users\Alexa\Embarcados\lab04\ProjectFiles\exemploTIVA.c(128): warning:  #177-D: function "floatToString"  was declared but never referenced
   static void floatToString(float value, char *pBuf, uint32_t len, uint32_t base, uint8_t zeros, uint8_t precision){
-exemploTIVA.c: 60 warnings, 0 errors
+exemploTIVA.c: 59 warnings, 0 errors
 compiling buzzer.c...
 C:\Users\Alexa\Embarcados\lab04\ProjectFiles\buzzer.h(18): warning:  #1295-D: Deprecated declaration buzzer_init - give arg types
   extern void buzzer_init();
@@ -276,8 +274,8 @@ compiling RTX_Conf_CM.c...
 assembling startup_TM4C129.s...
 compiling system_TM4C129.c...
 linking...
-Program Size: Code=16708 RO-data=3164 RW-data=96 ZI-data=9880  
-".\Flash\base_project.axf" - 0 Error(s), 108 Warning(s).
+Program Size: Code=18424 RO-data=3320 RW-data=100 ZI-data=9876  
+".\Flash\base_project.axf" - 0 Error(s), 107 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -308,25 +306,25 @@ Package Vendor: Keil
    * Component: ARM::CMSIS:CORE:5.2.0
 
    * Component: ARM::CMSIS:RTOS:Keil RTX:4.81.1
-      Source file:   CMSIS\RTOS\RTX\Templates\RTX_Conf_CM.c
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Mutex.c
-      Source file:   CMSIS\RTOS\RTX\SRC\ARM\SVC_Table.s
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MailQueue.c
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MemPool.c
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Timer.c
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MsgQueue.c
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Thread.c
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\main.c
-      Include file:  CMSIS\RTOS\RTX\UserCodeTemplates\osObjects.h
-      Include file:  CMSIS\RTOS\RTX\INC\cmsis_os.h
       Library file:  CMSIS\RTOS\RTX\LIB\ARM\RTX_CM4.lib
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Mutex.c
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MemPool.c
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MailQueue.c
+      Source file:   CMSIS\RTOS\RTX\SRC\ARM\SVC_Table.s
       Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Semaphore.c
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MsgQueue.c
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\main.c
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Timer.c
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Thread.c
+      Source file:   CMSIS\RTOS\RTX\Templates\RTX_Conf_CM.c
+      Include file:  CMSIS\RTOS\RTX\INC\cmsis_os.h
+      Include file:  CMSIS\RTOS\RTX\UserCodeTemplates\osObjects.h
 
    * Component: Keil::Device:Startup:1.0.0
       Include file:  Device\Include\TM4C129\TM4C129.h
       Source file:   Device\Source\system_TM4C129.c
       Source file:   Device\Source\ARM\startup_TM4C129.s
-Build Time Elapsed:  00:00:04
+Build Time Elapsed:  00:00:07
 </pre>
 </body>
 </html>

@@ -58,6 +58,7 @@ void PWM_amplitude_set(uint16_t volume){
 void PWM_per_set(uint16_t period){
 	bool last_state = g_current_state;
 	uint32_t ui32Gen;
+	period *= 2;
 	if(period < 3)
 		period = 3;
 	g_current_per = period;

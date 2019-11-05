@@ -156,12 +156,34 @@ static void floatToString(float value, char *pBuf, uint32_t len, uint32_t base, 
 }
 
 /*----------------------------------------------------------------------------
+ *    Handlers
+ *---------------------------------------------------------------------------*/
+
+void UART0_Handler(void){
+	// Variaveis para leitura de dados da UART
+	char m;
+	
+	// Enquanto o flag de recebimento nao for 
+	while((UART0->FR & (1<<4)) != 0);
+	UART0->FR &= (0<<4);
+	
+	// Coloca na variavel e 
+	m = UART0->DR;
+	
+	UART0	->	RIS |= (1<<4);
+	
+	UARTsend(m);
+	UARTprintString("\n\r");
+}
+
+/*----------------------------------------------------------------------------
  *    Initializations
  *---------------------------------------------------------------------------*/
 
 void init_all(){
 	cfaf128x128x16Init();	
 	PWM_function_init();
+	UARTenable();
 }
 
 void draw_pixel(uint16_t x, uint16_t y){
@@ -213,25 +235,28 @@ void PWM(void const *argument){
 	double pi = 3.1415926;
 	float tempo = 0;
 	float tempo_inc = 0;
+	float somatorio = 0;
 	uint16_t val;
 	uint32_t cycles;
 	char tempo_char[5];
 	uint32_t clock = osKernelSysTickFrequency;
 	PWM_per_set(200);
 	PWM_enable(true);
-	while(true){
+	while(1){
 		tempo_inc = (float)osKernelSysTick();
 		tempo_inc -= (float) cycles;
 		tempo_inc = (float)tempo_inc/clock;
 		tempo += tempo_inc;	
 		cycles = osKernelSysTick();	
-		data = amp*sin(tempo*2.0*pi*(29/7))+85;
-		//data = amp*sin(tempo*2.0*pi*29);
+		//data = amp*sin(tempo*2.0*pi*(12/7.1))+85;
+		//data = amp*sin(tempo*2.0*pi*(29/7.1));
 		//if(data <= 0)
-		//		data = amp + 85  ;
+		//		data = amp + 85;
 		//else
 		//if(data > 0)
-		//		data = 85 - amp ;
+		//		data = 85 - amp;
+		somatorio = (((-2*amp)/pi)*atan(1/(tan(pi*29*tempo))));
+		data = 85 + somatorio;	
 		val = 1020*abs(120-data);
 		PWM_amplitude_set(val);
 	}
@@ -240,14 +265,14 @@ void PWM(void const *argument){
 /*----------------------------------------------------------------------------
  *      Main
  *---------------------------------------------------------------------------*/
-int main (void) {	
+int main (void) {
 	osKernelInitialize();
 	
 	init_all();
 	
 	if(Init_Thread()==0)
 		return 0;
-	
+		
 	osKernelStart(); 
 	osDelay(osWaitForever);
 }
