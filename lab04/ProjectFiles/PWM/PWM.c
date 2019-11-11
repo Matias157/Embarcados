@@ -1,6 +1,6 @@
 #include "PWM.h"
 
-void PWM_function_init(void){
+void initPWM(void){
 	uint32_t ui32Gen;
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM0); // Enable the PWM0 peripheral
 	while(!SysCtlPeripheralReady(SYSCTL_PERIPH_PWM0));

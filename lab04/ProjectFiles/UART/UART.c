@@ -1,7 +1,7 @@
 #include "UART.h"
 
 // Inicializao UART
-void UARTenable(void){
+void initUART(void){
 		uint32_t ui32SysClock = SysCtlClockFreqSet((SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN | SYSCTL_USE_PLL | SYSCTL_CFG_VCO_480), 120000000); // PLL em 120MHz
 		static unsigned long g_ulBase = 0;
 		static const unsigned long g_ulUARTBase[3] = {UART0_BASE, UART1_BASE, UART2_BASE};
@@ -39,7 +39,7 @@ char UARTreceive(void){//leitura de caractere
 }
 
 //Escrita de elementos
-void UARTsend(char c){//Envio UM caracter
+void writeUART(char c){//Envio UM caracter
 	while((UART0->FR & (1<<5)) != 0);
 	UART0->DR = c;	//Escreve na saida o conteudo de c
 }
@@ -47,7 +47,7 @@ void UARTsend(char c){//Envio UM caracter
 //Escrita de string
 void UARTprintString(char* string){//Envia uma String
 	while(*string)//enquanto houver elementos na string
-		UARTsend(*(string++));//Envia caracteres para a saida
+		writeUART(*(string++));//Envia caracteres para a saida
 }
 
 // Menu inicial
