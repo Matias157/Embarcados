@@ -1,0 +1,6 @@
+thread A = 1257 ticks
+thread B = 1180 ticks
+thread C = 496 ticks
+thread D = 412 ticks
+thread E = 608 ticks
+thread F = 720 ticks
