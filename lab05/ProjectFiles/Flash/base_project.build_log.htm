@@ -141,17 +141,37 @@ C:\Users\Alexa\Embarcados\lab05\inc\hw_memmap.h(148): warning:  #47-D: incompati
   #define NVIC_BASE               0xE000E000  // Nested Vectored Interrupt Ctrl
 C:\Users\Alexa\Embarcados\lab05\ProjectFiles\PWM\PWM.h(36): warning:  #1-D: last line of file ends without a newline
   void PWM_per_set(uint16_t period);
-C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(212): warning:  #223-D: function "initUART" declared implicitly
+C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(265): warning:  #223-D: function "initUART" declared implicitly
         initUART();
-C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(272): warning:  #550-D: variable "caracter"  was set but never used
+C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(332): warning:  #550-D: variable "caracter"  was set but never used
         char caracter;
-C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(401): warning:  #1-D: last line of file ends without a newline
-  }
-C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(320): warning:  #177-D: variable "dois_a_n"  was declared but never referenced
-        double dois_a_n = 1.0;
-C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(324): warning:  #177-D: variable "tick_init_char"  was declared but never referenced
+C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(630): warning:  #177-D: variable "tick_init_char"  was declared but never referenced
         char tick_init_char [32];
-exemploTIVA.c: 61 warnings, 0 errors
+C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(631): warning:  #177-D: variable "tick_end_char"  was declared but never referenced
+        char tick_end_char [32];
+C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(679): warning:  #177-D: variable "tick_init_char"  was declared but never referenced
+        char tick_init_char [32];
+C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(680): warning:  #177-D: variable "tick_end_char"  was declared but never referenced
+        char tick_end_char [32];
+C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(729): warning:  #177-D: variable "tick_init_char"  was declared but never referenced
+        char tick_init_char [32];
+C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(730): warning:  #177-D: variable "tick_end_char"  was declared but never referenced
+        char tick_end_char [32];
+C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(777): warning:  #177-D: variable "tick_init_char"  was declared but never referenced
+        char tick_init_char [32];
+C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(778): warning:  #177-D: variable "tick_end_char"  was declared but never referenced
+        char tick_end_char [32];
+C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(823): warning:  #177-D: variable "tick_init_char"  was declared but never referenced
+        char tick_init_char [32];
+C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(824): warning:  #177-D: variable "tick_end_char"  was declared but never referenced
+        char tick_end_char [32];
+C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(872): warning:  #177-D: variable "tick_init_char"  was declared but never referenced
+        char tick_init_char [32];
+C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(873): warning:  #177-D: variable "tick_end_char"  was declared but never referenced
+        char tick_end_char [32];
+C:\Users\Alexa\Embarcados\lab05\ProjectFiles\exemploTIVA.c(928): warning:  #1-D: last line of file ends without a newline
+  }
+exemploTIVA.c: 71 warnings, 0 errors
 compiling buzzer.c...
 C:\Users\Alexa\Embarcados\lab05\ProjectFiles\buzzer.h(18): warning:  #1295-D: Deprecated declaration buzzer_init - give arg types
   extern void buzzer_init();
@@ -278,8 +298,8 @@ compiling RTX_Conf_CM.c...
 assembling startup_TM4C129.s...
 compiling system_TM4C129.c...
 linking...
-Program Size: Code=13500 RO-data=2864 RW-data=92 ZI-data=9892  
-".\Flash\base_project.axf" - 0 Error(s), 109 Warning(s).
+Program Size: Code=19764 RO-data=3052 RW-data=128 ZI-data=9928  
+".\Flash\base_project.axf" - 0 Error(s), 119 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -310,25 +330,25 @@ Package Vendor: Keil
    * Component: ARM::CMSIS:CORE:5.2.0
 
    * Component: ARM::CMSIS:RTOS:Keil RTX:4.81.1
-      Include file:  CMSIS\RTOS\RTX\INC\cmsis_os.h
-      Source file:   CMSIS\RTOS\RTX\SRC\ARM\SVC_Table.s
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MsgQueue.c
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Semaphore.c
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Thread.c
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Timer.c
-      Source file:   CMSIS\RTOS\RTX\Templates\RTX_Conf_CM.c
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MailQueue.c
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Mutex.c
       Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MemPool.c
-      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\main.c
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Timer.c
+      Source file:   CMSIS\RTOS\RTX\SRC\ARM\SVC_Table.s
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Mutex.c
       Include file:  CMSIS\RTOS\RTX\UserCodeTemplates\osObjects.h
+      Source file:   CMSIS\RTOS\RTX\Templates\RTX_Conf_CM.c
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\main.c
       Library file:  CMSIS\RTOS\RTX\LIB\ARM\RTX_CM4.lib
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Thread.c
+      Include file:  CMSIS\RTOS\RTX\INC\cmsis_os.h
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MailQueue.c
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\Semaphore.c
+      Source file:   CMSIS\RTOS\RTX\UserCodeTemplates\MsgQueue.c
 
    * Component: Keil::Device:Startup:1.0.0
+      Source file:   Device\Source\ARM\startup_TM4C129.s
       Include file:  Device\Include\TM4C129\TM4C129.h
       Source file:   Device\Source\system_TM4C129.c
-      Source file:   Device\Source\ARM\startup_TM4C129.s
-Build Time Elapsed:  00:00:06
+Build Time Elapsed:  00:00:04
 </pre>
 </body>
 </html>
