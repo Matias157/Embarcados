@@ -27,6 +27,7 @@ void initUART(void){
     // Configuracoes do UART
     SysCtlDelay(30); // Delay de inicializao
     UARTprintString("\033[2J"); // Envio de mensagem para a UART
+    //UARTprintMenu(); // Envio de mensagem para a UART
 }
 
 //Leitura de elementos

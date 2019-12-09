@@ -15,7 +15,6 @@
 #include "TM4C129.h"                    // Device header
 #include <stdbool.h>
 #include <math.h>
-
 #include "grlib/grlib.h"
 
 /*----------------------------------------------------------------------------
@@ -28,33 +27,24 @@
 
 #define GANTT 0
 #define PI 3.14159265358979323846
-#define DEADLINE_A 2137
-#define DEADLINE_B 1770
-#define DEADLINE_C 645
-#define DEADLINE_D 618
-#define DEADLINE_E 791
-#define DEADLINE_F 792
+#define DEADLINE_A 151000		
+#define DEADLINE_B 20000
+#define DEADLINE_C 50000
+#define DEADLINE_D 3000
+#define DEADLINE_E 70000
+#define DEADLINE_F 100000
 #define PERIODICIDADE_A 8
 #define PERIODICIDADE_B 2
 #define PERIODICIDADE_C 5
 #define PERIODICIDADE_D 1
 #define PERIODICIDADE_E 6
 #define PERIODICIDADE_F 10
-#define UM_SEGUNDO 720000000
+#define UM_SEGUNDO 700000000
 #define TOTAL_THREADS 6
-#define TIMER_TICK 2200
-
-// if usado para gerar o Gantt
-#if GANTT == 1 
-int global_cycles = 0 ;					// ciclos usados para diminuir o tempo gerado no Gantt
-#endif
+#define TIMER_TICK 20
 
 //To print on the screen
 tContext sContext;
-#if GANTT == 1
-osMutexDef(mu);	
-osMutexId(mu_ID);
-#endif
 
 /****************** Enums ******************/
 typedef enum estado{
@@ -81,11 +71,10 @@ typedef struct tarefa_display{
 	double percentual_exec;
 	int atraso;
 	struct tarefa_display *proxima_tarefa;
-}tarefa_diaplay;
+}tarefa_display;
 
 typedef struct info_tarefas{
-	int tick_init;
-	int tick_end;
+	int duracao;
 	int sequencia;
 	int max_sequencia;
 	double resultado;
@@ -94,7 +83,7 @@ typedef struct info_tarefas{
 
 /****************** Enums ******************/
 osMailQId mail_tarefa_ID;
-osMailQDef (mail_tarefa, 1, info_tarefas*);
+osMailQDef (mail_tarefa, 5, info_tarefas*);
 
 /****************** Criacao das threads *******************/
 void thread_A(void const *argument);
@@ -151,6 +140,8 @@ int Init_Thread (void) {
 	
   return(0);
 }
+
+
 
 /*----------------------------------------------------------------------------
  *  Transforming int to string
@@ -307,6 +298,14 @@ void printString(char* string, int lin, int col){
 	// FIM DA SECAO CRITICA
 }
 
+
+void printDisplay(char *s, int linha, int coluna){
+	osMutexWait(mutex_display_ID,osWaitForever);
+	GrContextForegroundSet(&sContext, ClrWhite);
+	GrStringDraw(&sContext, s, -1, (sContext.psFont->ui8MaxWidth)*coluna, (sContext.psFont->ui8Height+2)*linha, true);
+	osMutexRelease(mutex_display_ID);
+}
+
 int fatorial(int a){
 	int i;
 	int result = 1;
@@ -317,49 +316,20 @@ int fatorial(int a){
 	
 	return(result);
 }
-void printDisplay(char *s, int linha, int coluna){
-	osMutexWait(mutex_display_ID,osWaitForever);
-	GrContextForegroundSet(&sContext, ClrWhite);
-	GrStringDraw(&sContext, s, -1, (sContext.psFont->ui8MaxWidth)*coluna, (sContext.psFont->ui8Height+2)*linha, true);
-	osMutexRelease(mutex_display_ID);
-}
-/*----------------------------------------------------------------------------
- *    Handlers
- *---------------------------------------------------------------------------*/
 
-void UART0_Handler(void){
-	// Variaveis para leitura de dados da UART
-	char caracter;
-	
-	// Espera flag de interrupção ser 0
-	while((UART0->FR & (0x10000)) != 0);
-	UART0->FR &= (0x10000); // limpa flag de interrupção (coloca 1)
-	
-	// Coloca saida na variável
-	caracter = UART0->DR;
-	
-	UART0->RIS |= (0x1000); // seta RIS
-	
-	//writeUART(caracter);
-	//UARTprintString("\n\r");
-}
-
-/*----------------------------------------------------------------------------
- *    Threads
- *---------------------------------------------------------------------------*/
 
 void escalonador(void const *argument){
-	struct tarefa_display* prontas[6];
-	struct tarefa_display* espera[6];
-	struct tarefa_display tarefa_A, tarefa_B, tarefa_C, tarefa_D, tarefa_E, tarefa_F;
-	struct tarefa_display* tarefa_running;
-	struct tarefa_display* prox_tarefa;
-	int i;
+	tarefa_display *prontas[7];
+	tarefa_display *espera[7];
+	tarefa_display tarefa_A, tarefa_B, tarefa_C, tarefa_D, tarefa_E, tarefa_F;
+	tarefa_display *tarefa_running=NULL;
+	tarefa_display *prox_tarefa=NULL;
+	int i,j;
 	char str_s[50];
 	// evento
 	osEvent evt;
 	// cria tarefa atual
-	struct info_tarefas* info_tarefa_atual;
+	info_tarefas *info_tarefa_atual = NULL;
 	// inicializa contador de um segundo
 	int conta_um_segundo = 0;
 	// inicializa tempo de relaxamento
@@ -432,154 +402,199 @@ void escalonador(void const *argument){
 	prontas[3] = &tarefa_D;
 	prontas[4] = &tarefa_E;
 	prontas[5] = &tarefa_F;
+	prontas[6] = NULL;
 	// criacao do Mail
 	mail_tarefa_ID = osMailCreate(osMailQ(mail_tarefa), NULL);
+	osSignalWait(0x3f,osWaitForever);
 	while(1){
+		
 		//coloca o escalonador para dormir
 		osSignalWait(0x01,TIMER_TICK);
+		if(tarefa_running)osThreadSetPriority(tarefa_running->id,osPriorityNormal);
 		evt = osMailGet(mail_tarefa_ID,0);
-		printDisplay("                                                                             ",0,0);
-		printDisplay("                                                                             ",1,0);
-		printDisplay("                                                                             ",2,0);
-		printDisplay("                                                                             ",3,0);
-		printDisplay("                                                                             ",4,0);
-		printDisplay("                                                                             ",5,0);
-		printDisplay("                                                                             ",6,0);
-		printDisplay("                                                                             ",7,0);
-		printDisplay("                                                                             ",8,0);
 		if(evt.status == osEventMail){
-			info_tarefa_atual = (info_tarefas*)evt.value.v;
+			info_tarefa_atual = (info_tarefas*)evt.value.p;
+			
+			if(tarefa_running->id == thread_A_ID){
+					printDisplay("Tarefa A",0,8);
+				}
+				else if(tarefa_running->id == thread_B_ID){
+					printDisplay("Tarefa B",0,8);
+				}
+				else if(tarefa_running->id == thread_C_ID){
+					printDisplay("Tarefa C",0,8);
+				}
+				else if(tarefa_running->id == thread_D_ID){
+					printDisplay("Tarefa D",0,8);
+				}
+				else if(tarefa_running->id == thread_E_ID){
+					printDisplay("Tarefa E",0,8);
+				}
+				else if(tarefa_running->id == thread_F_ID){
+					printDisplay("Tarefa F",0,8);
+				}
+				
+				// calcula tempo atraso
+				tarefa_running->atraso = (info_tarefa_atual->duracao) - tarefa_running->deadline;
+				intToString(tarefa_running->atraso,str_s,50,10,3);
+				printDisplay(str_s,5,8);
+				
 			if(info_tarefa_atual->fault == true){
-				if(tarefa_running->prioridade == realtime){
+				if(tarefa_running->id == thread_F_ID){
 					//PARA TUDO
 					printDisplay("   MASTER FAULT   ",9,0);
-					while(1);
-				}
-				// atualiza prioridade
-				tarefa_running->prioridade--;
-				// calcula tempo atraso
-				tarefa_running->atraso = (info_tarefa_atual->tick_end - info_tarefa_atual->tick_init) - tarefa_running->deadline;
-				printDisplay("   SECONDARY FAULT   ",9,0);
-				printDisplay("calc.atual: ",10,0);
+					printDisplay("Calc.atual: ",10,0);
 				floatToString(info_tarefa_atual->resultado,str_s,50,10,3,5);
 				printDisplay(str_s,10,12);
 				printDisplay("tempo: ",11,0);
-				intToString(info_tarefa_atual->tick_end - info_tarefa_atual->tick_init,str_s,50,10,3);
+				intToString(info_tarefa_atual->duracao,str_s,50,10,3);
 				printDisplay(str_s,11,7);
 				printDisplay("sequencia: ",12,0);
 				intToString(info_tarefa_atual->sequencia,str_s,50,10,3);
 				printDisplay(str_s,12,11);
-				intToString(tarefa_running->atraso,str_s,50,10,3);
-				printDisplay(str_s,5,8);
+				
+					while(1);
+				}
+				// atualiza prioridade
+				tarefa_running->prioridade--;
+				printDisplay("calc.atual: ",10,0);
+				floatToString(info_tarefa_atual->resultado,str_s,50,10,3,5);
+				printDisplay(str_s,10,12);
+				printDisplay("tempo: ",11,0);
+				intToString(info_tarefa_atual->duracao,str_s,50,10,3);
+				printDisplay(str_s,11,7);
+				printDisplay("sequencia: ",12,0);
+				intToString(info_tarefa_atual->sequencia,str_s,50,10,3);
+				printDisplay(str_s,12,11);
+				printDisplay("   SECONDARY FAULT   ",9,0);
+				
+				
 			}
-			else if(info_tarefa_atual->tick_end - info_tarefa_atual->tick_init < tarefa_running->deadline/2.0){
-					if(tarefa_running->prioridade == realtime){
+			else if(info_tarefa_atual->duracao < tarefa_running->deadline/2.0){
+					if(tarefa_running->id == thread_F_ID){
 						printDisplay("   MASTER FAULT   ",9,0);
+						printDisplay("calc.atual: ",10,0);
+				floatToString(info_tarefa_atual->resultado,str_s,50,10,3,5);
+				printDisplay(str_s,10,12);
+				printDisplay("tempo: ",11,0);
+				intToString(info_tarefa_atual->duracao,str_s,50,10,3);
+				printDisplay(str_s,11,7);
+				printDisplay("sequencia: ",12,0);
+				intToString(info_tarefa_atual->sequencia,str_s,50,10,3);
+				printDisplay(str_s,12,11);
 						while(1);
 					}
 					// atualiza prioridade
 					tarefa_running->prioridade++;
 					printDisplay("   SECONDARY FAULT   ",9,0);
 					printDisplay("calc.atual: ",10,0);
-					floatToString(info_tarefa_atual->resultado,str_s,50,10,3,5);
-					printDisplay(str_s,10,12);
-					printDisplay("tempo: ",11,0);
-					intToString(info_tarefa_atual->tick_end - info_tarefa_atual->tick_init,str_s,50,10,3);
-					printDisplay(str_s,11,7);
-					printDisplay("sequencia: ",12,0);
-					intToString(info_tarefa_atual->sequencia,str_s,50,10,3);
-					printDisplay(str_s,12,11);
+				floatToString(info_tarefa_atual->resultado,str_s,50,10,3,5);
+				printDisplay(str_s,10,12);
+				printDisplay("tempo: ",11,0);
+				intToString(info_tarefa_atual->duracao,str_s,50,10,3);
+				printDisplay(str_s,11,7);
+				printDisplay("sequencia: ",12,0);
+				intToString(info_tarefa_atual->sequencia,str_s,50,10,3);
+				printDisplay(str_s,12,11);
+					
 			}
+			
+			// seta estado e ajeita a fila
+			if(tarefa_running->periodicidade == 0){
+				if(tarefa_running->id == thread_A_ID){
+					tarefa_running->periodicidade = PERIODICIDADE_A;
+				}
+				else if(tarefa_running->id == thread_B_ID){
+					tarefa_running->periodicidade = PERIODICIDADE_B;
+				}
+				else if(tarefa_running->id == thread_C_ID){
+					tarefa_running->periodicidade = PERIODICIDADE_C;
+				}
+				else if(tarefa_running->id == thread_D_ID){
+					tarefa_running->periodicidade = PERIODICIDADE_D;
+				}
+				else if(tarefa_running->id == thread_E_ID){
+					tarefa_running->periodicidade = PERIODICIDADE_E;
+				}
+				else if(tarefa_running->id == thread_F_ID){
+					tarefa_running->periodicidade = PERIODICIDADE_F;
+				}
+				tarefa_running->estado = waiting;
+				for(i = 0; i < TOTAL_THREADS && espera[i] != NULL; i++);
+				espera[i] = tarefa_running;
+				espera[i]->estado = waiting;
+			}
+			else{
+				//coloca na lista de prontas
+				for(i = 0; i < TOTAL_THREADS && prontas[i] != NULL; i++);
+				if (tarefa_running) prontas[i] = tarefa_running;
+				if (prontas[i]) prontas[i]->estado = ready;
+			}
+		
+		}
+		else{
+			for(i = 0; i < TOTAL_THREADS && prontas[i] != NULL; i++);
+			if (tarefa_running)prontas[i] = tarefa_running;
+			if (prontas[i]) prontas[i]->estado = ready;
+		}
+		if(tarefa_running){
 			intToString(tarefa_running->prioridade,str_s,50,10,3);
 			printDisplay(str_s,1,12);
 			// atualiza periodicidade
 			tarefa_running->periodicidade--;
 			// calcula tempo de relaxamento
-			tarefa_running->tempo_relaxamento = tarefa_running->deadline - (info_tarefa_atual->tick_end - info_tarefa_atual->tick_init);
+			tarefa_running->tempo_relaxamento = tarefa_running->deadline - (info_tarefa_atual->duracao);
 			intToString(tarefa_running->tempo_relaxamento,str_s,50,10,3);
 			printDisplay(str_s,2,12);
 			// calcula percentual de execucao (baseado na sequencia)
-			tarefa_running->percentual_exec = info_tarefa_atual->sequencia/info_tarefa_atual->max_sequencia;
-			floatToString(tarefa_running->percentual_exec,str_s,50,10,3,5);
+			tarefa_running->percentual_exec = (double)info_tarefa_atual->sequencia/(double)info_tarefa_atual->max_sequencia;
+			floatToString(tarefa_running->percentual_exec,str_s,50,10,3,2);
 			printDisplay(str_s,4,14);
-			printDisplay("Ready: ",3,8);
-			// seta estado e ajeita a fila
-			if(tarefa_running->periodicidade == 0){
-				if(tarefa_running->id == thread_A_ID){
-					tarefa_running->periodicidade = PERIODICIDADE_A;
-					printDisplay("Tarefa A",0,8);
-				}
-				else if(tarefa_running->id == thread_B_ID){
-					tarefa_running->periodicidade = PERIODICIDADE_B;
-					printDisplay("Tarefa B",0,8);
-				}
-				else if(tarefa_running->id == thread_C_ID){
-					tarefa_running->periodicidade = PERIODICIDADE_C;
-					printDisplay("Tarefa C",0,8);
-				}
-				else if(tarefa_running->id == thread_D_ID){
-					tarefa_running->periodicidade = PERIODICIDADE_D;
-					printDisplay("Tarefa D",0,8);
-				}
-				else if(tarefa_running->id == thread_E_ID){
-					tarefa_running->periodicidade = PERIODICIDADE_E;
-					printDisplay("Tarefa E",0,8);
-				}
-				else if(tarefa_running->id == thread_F_ID){
-					tarefa_running->periodicidade = PERIODICIDADE_F;
-					printDisplay("Tarefa F",0,8);
-				}
-				tarefa_running->estado = waiting;
-				for(i = 0; i < TOTAL_THREADS || espera[i] == NULL; i++);
-				espera[i] = tarefa_running;
-				espera[i]->estado = waiting;
-			}
+			printDisplay("Ready  ",3,8);
 		}
-		else{
-			for(i = 0; i < TOTAL_THREADS || prontas[i] == NULL; i++);
-			prontas[i] = tarefa_running;
-			prontas[i]->estado = ready;
-		}
+		
 		// varrer lista de espera depois de um segundo e colocá-las na lista de prontas
 		if((osKernelSysTick() - conta_um_segundo) > UM_SEGUNDO){
 			conta_um_segundo = osKernelSysTick();
 			for(i = 0; i < TOTAL_THREADS; i++){
 				if(espera[i] != NULL){
-					for(i = 0; i < TOTAL_THREADS || prontas[i] == NULL; i++);
-					prontas[i] = tarefa_running;
-					prontas[i]->estado = ready;
+					for(j = 0; j < TOTAL_THREADS && prontas[j] != NULL; j++);
+					prontas[j] = espera[i];
+					if (prontas[j]) prontas[j]->estado = ready;
 				}
 			}
 		}
+		
 		// varrer lista de prontas, ver qual tem maior prioridade
-		for(i = 0; i < TOTAL_THREADS || prontas[i] == NULL; i++); // acha um que não é null
+		for(i = 0; i < TOTAL_THREADS && prontas[i] == NULL; i++); // acha um que não é null
 		tarefa_running = prontas[i];
+		j=i;
 		for(i = 0; i < TOTAL_THREADS; i++){
 			if(prontas[i] != NULL ){
 				if(prontas[i]->prioridade == tarefa_running->prioridade){
 					if(prontas[i]->periodicidade > tarefa_running->periodicidade){
 						tarefa_running = prontas[i];
-						tarefa_running->estado = running;
-						prontas[i] = NULL;
+						j=i;
 					}
 				}
 				else if(prontas[i]->prioridade < tarefa_running->prioridade){
 					tarefa_running = prontas[i];
-					tarefa_running->estado = running;
-					prontas[i] = NULL;
+					j=i;
 				}
 			}
 		}
-		for(i = 0; i < TOTAL_THREADS || prontas[i] == NULL; i++); // acha um que não é null
-		tarefa_running = prontas[i];
+		prontas[j] = NULL;
+		
+		for(i = 0; i < TOTAL_THREADS && prontas[i] == NULL; i++); // acha um que não é null
+		prox_tarefa = prontas[i];
 		for(i = 0; i < TOTAL_THREADS; i++){
 			if(prontas[i] != NULL ){
-				if(prontas[i]->prioridade == tarefa_running->prioridade){
-					if(prontas[i]->periodicidade > tarefa_running->periodicidade){
+				if(prontas[i]->prioridade == prox_tarefa->prioridade){
+					if(prontas[i]->periodicidade > prox_tarefa->periodicidade){
 						prox_tarefa = prontas[i];
 					}
 				}
-				else if(prontas[i]->prioridade < tarefa_running->prioridade){
+				else if(prontas[i]->prioridade < prox_tarefa->prioridade){
 					prox_tarefa = prontas[i];
 				}
 			}
@@ -595,7 +610,7 @@ void escalonador(void const *argument){
 			printDisplay("Tarefa C",6,9);
 		}
 		else if(prox_tarefa->id == thread_D_ID){
-			printDisplay("Tarefa D",6,8);
+			printDisplay("Tarefa D",6,9);
 		}
 		else if(prox_tarefa->id == thread_E_ID){
 			printDisplay("Tarefa E",6,9);
@@ -603,9 +618,8 @@ void escalonador(void const *argument){
 		else if(prox_tarefa->id == thread_F_ID){
 			printDisplay("Tarefa F",6,9);
 		}
-		printDisplay("Running: ",3,8);
-		floatToString(info_tarefa_atual->resultado,str_s,50,10,3,5);
-		printDisplay(str_s,7,11);
+	
+		printDisplay("Running ",3,8);
 		
 		printDisplay("Tarefa: ",0,0);
 		printDisplay("Prioridade: ",1,0);
@@ -614,14 +628,16 @@ void escalonador(void const *argument){
 		printDisplay("Percent.exec: ",4,0);
 		printDisplay("Atraso: ",5,0);
 		printDisplay("Proximo: ",6,0);
-		printDisplay("Resultado: ",7,0);
-		printDisplay("Faltas: ",8,0);
+		printDisplay("Faltas: ",7,0);
 		// aumenta a prioridade da um signal para a que foi escolhida
+		if(info_tarefa_atual)osMailFree(mail_tarefa_ID,info_tarefa_atual);
 		osThreadSetPriority(tarefa_running->id,osPriorityHigh);
+		osSignalSet((tarefa_running->id),0x01);
 	}
 }
 
 void thread_A(void const *argument){
+	
 	int i;
 	double x;
 	uint64_t tick_init = 0;
@@ -629,40 +645,26 @@ void thread_A(void const *argument){
 	uint64_t duracao = 0;
 	char tick_init_char [32];
 	char tick_end_char [32];
-	info_tarefas *tarefaA_info;
-	tarefaA_info->tick_init = 0;
-	tarefaA_info->tick_end = 0;
-	tarefaA_info->resultado = 0;
-	tarefaA_info->sequencia = 0;
-	tarefaA_info->fault = false;
+	info_tarefas* tarefaA_info;
+	
+	osSignalSet(escalonador_ID,0x01);
+	
 	while(1){
 		osSignalWait(0x01,osWaitForever);
 		tarefaA_info = (info_tarefas*)osMailCAlloc(mail_tarefa_ID,osWaitForever);
 		x = 0.0;
 		tick_init = osKernelSysTick();
-		tarefaA_info->tick_init = tick_init;
 		tarefaA_info->fault = false;
 		for(i = 0; i <= 256; i++){
 			x += (double)i + (i + 2);
 			tick_end = osKernelSysTick();
 			duracao = tick_end - tick_init;
-			if(duracao > DEADLINE_A){
-				tarefaA_info->tick_end = tick_end;
-				tarefaA_info->sequencia = i;
-				tarefaA_info->resultado = x;
-				tarefaA_info->fault = true;
-			}
-		}
-		tick_end = osKernelSysTick();
-		tick_end = tick_end - tick_init;
-		//intToString(tick_end,tick_end_char,32,10,0);
-		//UARTprintString("tick_end: ");
-		//UARTprintString(tick_end_char);
-		//UARTprintString("\r\n");
-		if(!tarefaA_info->fault){
-			tarefaA_info->tick_end = tick_end;
+			tarefaA_info->duracao = duracao;
 			tarefaA_info->sequencia = i;
 			tarefaA_info->resultado = x;
+			if(duracao > DEADLINE_A){
+				tarefaA_info->fault = true;
+			}
 		}
 		tarefaA_info->max_sequencia = 256;
 		osMailPut(mail_tarefa_ID,(info_tarefas*)tarefaA_info);
@@ -670,6 +672,7 @@ void thread_A(void const *argument){
 }
 
 void thread_B(void const *argument){
+	
 	int i;
 	double dois_a_n;
 	double x;
@@ -679,48 +682,41 @@ void thread_B(void const *argument){
 	char tick_init_char [32];
 	char tick_end_char [32];
 	info_tarefas *tarefaB_info;
-	tarefaB_info->tick_init = 0;
-	tarefaB_info->tick_end = 0;
-	tarefaB_info->resultado = 0;
-	tarefaB_info->sequencia = 0;
-	tarefaB_info->fault = false;
+	
+	osSignalSet(escalonador_ID,0x02);
 	while(1){
+		
 		osSignalWait(0x01,osWaitForever);
 		tarefaB_info = (info_tarefas*)osMailCAlloc(mail_tarefa_ID,osWaitForever);
 		dois_a_n = 1.0;
 		x = 0.0;
 		tick_init = osKernelSysTick();
-		tarefaB_info->tick_init = tick_init;
 		tarefaB_info->fault = false;
 		for(i = 1; i <= 16; i++){
 			dois_a_n = dois_a_n * 2;
 			x += dois_a_n/fatorial(i);
 			tick_end = osKernelSysTick();
 			duracao = tick_end - tick_init;
+			tarefaB_info->duracao = duracao;
+			tarefaB_info->sequencia = i;
+			tarefaB_info->resultado = x;
 			if(duracao > DEADLINE_B){
-				tarefaB_info->tick_end = tick_end;
-				tarefaB_info->sequencia = i;
-				tarefaB_info->resultado = x;
 				tarefaB_info->fault = true;
 			}
 		}
-		tick_end = osKernelSysTick();
-		tick_end = tick_end - tick_init;
-		//intToString(tick_end,tick_end_char,32,10,0);
-		//UARTprintString("tick_end: ");
-		//UARTprintString(tick_end_char);
-		//UARTprintString("\r\n");
-		if(!tarefaB_info->fault){
-			tarefaB_info->tick_end = tick_end;
-			tarefaB_info->sequencia = i;
-			tarefaB_info->resultado = x;
-		}
+//		tick_end = osKernelSysTick();
+//		tick_end = tick_end - tick_init;
+//		intToString(tick_end,tick_end_char,32,10,0);
+//		UARTprintString("tick_end: ");
+//		UARTprintString(tick_end_char);
+//		UARTprintString("\r\n");
 		tarefaB_info->max_sequencia = 16;
 		osMailPut(mail_tarefa_ID,(info_tarefas*)tarefaB_info);
 	}
 }
 
 void thread_C(void const *argument){
+	
 	int i;
 	double x;
 	uint64_t tick_init = 0;
@@ -729,46 +725,39 @@ void thread_C(void const *argument){
 	char tick_init_char [32];
 	char tick_end_char [32];
 	info_tarefas *tarefaC_info;
-	tarefaC_info->tick_init = 0;
-	tarefaC_info->tick_end = 0;
-	tarefaC_info->resultado = 0;
-	tarefaC_info->sequencia = 0;
-	tarefaC_info->fault = false;
+	
+	osSignalSet(escalonador_ID,0x04);
 	while(1){
+		
 		osSignalWait(0x01,osWaitForever);
 		tarefaC_info = (info_tarefas*)osMailCAlloc(mail_tarefa_ID,osWaitForever);
 		x = 0.0;
 		tick_init = osKernelSysTick();
-		tarefaC_info->tick_init = tick_init;
 		tarefaC_info->fault = false;
 		for(i = 1; i <= 72; i++){
 			x += (i + 1) / (double)i;
 			tick_end = osKernelSysTick();
 			duracao = tick_end - tick_init;
+			tarefaC_info->duracao = duracao;
+			tarefaC_info->sequencia = i;
+			tarefaC_info->resultado = x;
 			if(duracao > DEADLINE_C){
-				tarefaC_info->tick_end = tick_end;
-				tarefaC_info->sequencia = i;
-				tarefaC_info->resultado = x;
 				tarefaC_info->fault = true;
 			}
 		}
-		tick_end = osKernelSysTick();
-		tick_end = tick_end - tick_init;
-		//intToString(tick_end,tick_end_char,32,10,0);
-		//UARTprintString("tick_end: ");
-		//UARTprintString(tick_end_char);
-		//UARTprintString("\r\n");
-		if(!tarefaC_info->fault){
-			tarefaC_info->tick_end = tick_end;
-			tarefaC_info->sequencia = i;
-			tarefaC_info->resultado = x;
-		}
+//		tick_end = osKernelSysTick();
+//		tick_end = tick_end - tick_init;
+//		intToString(tick_end,tick_end_char,32,10,0);
+//		UARTprintString("tick_end: ");
+//		UARTprintString(tick_end_char);
+//		UARTprintString("\r\n");
 		tarefaC_info->max_sequencia = 72;
 		osMailPut(mail_tarefa_ID,(info_tarefas*)tarefaC_info);
 	}
 }
 
 void thread_D(void const *argument){
+	
 	int i = 1;
 	double x;
 	uint64_t tick_init = 0;
@@ -777,44 +766,35 @@ void thread_D(void const *argument){
 	char tick_init_char [32];
 	char tick_end_char [32];
 	info_tarefas *tarefaD_info;
-	tarefaD_info->tick_init = 0;
-	tarefaD_info->tick_end = 0;
-	tarefaD_info->resultado = 0;
-	tarefaD_info->sequencia = 0;
-	tarefaD_info->fault = false;
+	
+	osSignalSet(escalonador_ID,0x08);
 	while(1){
+		
 		osSignalWait(0x01,osWaitForever);
 		tarefaD_info = (info_tarefas*)osMailCAlloc(mail_tarefa_ID,osWaitForever);
 		x = 0.0;
 		tick_init = osKernelSysTick();
-		tarefaD_info->tick_init = tick_init;
 		tarefaD_info->fault = false;
 		x = 1.0 + (5.0/(fatorial(3))) + (5.0/(fatorial(5))) + (5.0/(fatorial(7))) + (5.0/(fatorial(9)));
 		tick_end = osKernelSysTick();
 		duracao = tick_end - tick_init;
-		if(duracao > DEADLINE_C){
-			tarefaD_info->tick_end = tick_end;
-			tarefaD_info->sequencia = i;
-			tarefaD_info->resultado = x;
+		tarefaD_info->duracao = duracao;
+		tarefaD_info->sequencia = i;
+		tarefaD_info->resultado = x;
+		if(duracao > DEADLINE_D){
 			tarefaD_info->fault = true;
 		}
-		tick_end = osKernelSysTick();
-		tick_end = tick_end - tick_init;
-		//intToString(tick_end,tick_end_char,32,10,0);
-		//UARTprintString("tick_end: ");
-		//UARTprintString(tick_end_char);
-		//UARTprintString("\r\n");
-		if(!tarefaD_info->fault){
-			tarefaD_info->tick_end = tick_end;
-			tarefaD_info->sequencia = i;
-			tarefaD_info->resultado = x;
-		}
-		tarefaD_info->max_sequencia = 1;
+//		intToString(duracao,tick_end_char,32,10,0);
+//		UARTprintString("tick_end: ");
+//		UARTprintString(tick_end_char);
+//		UARTprintString("\r\n");
+//		tarefaD_info->max_sequencia = 1;
 		osMailPut(mail_tarefa_ID,(info_tarefas*)tarefaD_info);
 	}
 }
 
 void thread_E(void const *argument){
+	
 	int i;
 	double x;
 	uint64_t tick_init = 0;
@@ -823,46 +803,37 @@ void thread_E(void const *argument){
 	char tick_init_char [32];
 	char tick_end_char [32];
 	info_tarefas *tarefaE_info;
-	tarefaE_info->tick_init = 0;
-	tarefaE_info->tick_end = 0;
-	tarefaE_info->resultado = 0;
-	tarefaE_info->sequencia = 0;
-	tarefaE_info->fault = false;
+	
+	osSignalSet(escalonador_ID,0x10);
 	while(1){
+		
 		osSignalWait(0x01,osWaitForever);
 		tarefaE_info = (info_tarefas*)osMailCAlloc(mail_tarefa_ID,osWaitForever);
 		x = 0.0;
 		tick_init = osKernelSysTick();
-		tarefaE_info->tick_init = tick_init;
 		tarefaE_info->fault = false;
 		for(i = 1; i <= 100; i++){
 			x += i * PI * PI;
 			tick_end = osKernelSysTick();
 			duracao = tick_end - tick_init;
-			if(duracao > DEADLINE_C){
-				tarefaE_info->tick_end = tick_end;
-				tarefaE_info->sequencia = i;
-				tarefaE_info->resultado = x;
+			tarefaE_info->sequencia = i;
+			tarefaE_info->resultado = x;
+			tarefaE_info->duracao = duracao;
+			if(duracao > DEADLINE_E){
 				tarefaE_info->fault = true;
 			}
 		}
-		tick_end = osKernelSysTick();
-		tick_end = tick_end - tick_init;
-		//intToString(tick_end,tick_end_char,32,10,0);
-		//UARTprintString("tick_end: ");
-		//UARTprintString(tick_end_char);
-		//UARTprintString("\r\n");
-		if(!tarefaE_info->fault){
-			tarefaE_info->tick_end = tick_end;
-			tarefaE_info->sequencia = i;
-			tarefaE_info->resultado = x;
-		}
+//		intToString(duracao,tick_end_char,32,10,0);
+//		UARTprintString("tick_end: ");
+//		UARTprintString(tick_end_char);
+//		UARTprintString("\r\n");
 		tarefaE_info->max_sequencia = 100;
 		osMailPut(mail_tarefa_ID,(info_tarefas*)tarefaE_info);
 	}
 }
 
 void thread_F(void const *argument){
+	
 	int i;
 	double dois_a_n;
 	double x;
@@ -872,42 +843,32 @@ void thread_F(void const *argument){
 	char tick_init_char [32];
 	char tick_end_char [32];
 	info_tarefas *tarefaF_info;
-	tarefaF_info->tick_init = 0;
-	tarefaF_info->tick_end = 0;
-	tarefaF_info->resultado = 0;
-	tarefaF_info->sequencia = 0;
-	tarefaF_info->fault = false;
+
+	osSignalSet(escalonador_ID,0x20);
 	while(1){
+		
 		osSignalWait(0x01,osWaitForever);
 		tarefaF_info = (info_tarefas*)osMailCAlloc(mail_tarefa_ID,osWaitForever);
 		dois_a_n = 1.0;
 		x = 0.0;
 		tick_init = osKernelSysTick();
-		tarefaF_info->tick_init = tick_init;
 		tarefaF_info->fault = false;
 		for(i = 1; i <= 128; i++){
 			dois_a_n = dois_a_n * 2.0;
 			x += i * i * i / dois_a_n;
 			tick_end = osKernelSysTick();
 			duracao = tick_end - tick_init;
-			if(duracao > DEADLINE_C){
-				tarefaF_info->tick_end = tick_end;
-				tarefaF_info->sequencia = i;
-				tarefaF_info->resultado = x;
+			tarefaF_info->duracao = duracao;
+			tarefaF_info->sequencia = i;
+			tarefaF_info->resultado = x;
+			if(duracao > DEADLINE_F){
 				tarefaF_info->fault = true;
 			}
 		}
-		tick_end = osKernelSysTick();
-		tick_end = tick_end - tick_init;
-		//intToString(tick_end,tick_end_char,32,10,0);
-		//UARTprintString("tick_end: ");
-		//UARTprintString(tick_end_char);
-		//UARTprintString("\r\n");
-		if(!tarefaF_info->fault){
-			tarefaF_info->tick_end = tick_end;
-			tarefaF_info->sequencia = i;
-			tarefaF_info->resultado = x;
-		}
+//		intToString(duracao,tick_end_char,32,10,0);
+//		UARTprintString("tick_end: ");
+//		UARTprintString(tick_end_char);
+//		UARTprintString("\r\n");
 		tarefaF_info->max_sequencia = 128;
 		osMailPut(mail_tarefa_ID,(info_tarefas*)tarefaF_info);
 	}
@@ -916,11 +877,11 @@ void thread_F(void const *argument){
 /*----------------------------------------------------------------------------
  *      Main
  *---------------------------------------------------------------------------*/
-int main (void) {		
-	osKernelInitialize();
+int main (void) {
 	init_all();
+	osKernelInitialize();
 	
-	if(Init_Thread()==0)
+	if(Init_Thread()!= 0)
 		return 0;
 		
 	osKernelStart(); 

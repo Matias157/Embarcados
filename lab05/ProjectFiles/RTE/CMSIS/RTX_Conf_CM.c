@@ -55,7 +55,7 @@
 //   <i> Defines default stack size for threads with osThreadDef stacksz = 0
 //   <i> Default: 200
 #ifndef OS_STKSIZE
- #define OS_STKSIZE 200
+ #define OS_STKSIZE 600
 #endif
 
 //   <o>Main Thread stack size [bytes] <64-32768:8><#/4>
@@ -263,7 +263,7 @@ void os_tick_irqack (void) {
 #define OS_ERROR_TIMER_OVF      4
 
 extern osThreadId svcThreadGetId (void);
-
+osThreadId a = 0;
 void os_error (uint32_t error_code) {
   /* This function is called when a runtime error is detected.  */
   /* Parameter 'error_code' holds the runtime error code.       */
@@ -273,7 +273,8 @@ void os_error (uint32_t error_code) {
     case OS_ERROR_STACK_OVF:
       /* Stack overflow detected for the currently running task. */
       /* Thread can be identified by calling svcThreadGetId().   */
-      break;
+      a=svcThreadGetId();
+		  break;
     case OS_ERROR_FIFO_OVF:
       /* ISR FIFO Queue buffer overflow detected. */
       break;
